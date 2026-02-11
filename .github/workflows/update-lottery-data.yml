@@ -2,9 +2,15 @@ name: Update Lottery Data
 
 on:
   schedule:
-    # Run daily at 5:00 AM UTC (12:00 AM ET after draws)
-    - cron: '0 5 * * *'
-  workflow_dispatch: # Allow manual trigger
+    # Run after each draw window to capture latest results.
+    # All times UTC. Draws happen ~11 PM ET = ~4 AM UTC next day.
+    #
+    # Powerball draws: Mon, Wed, Sat → fetch Tue, Thu, Sun at 6 AM UTC
+    # Mega Millions draws: Tue, Fri → fetch Wed, Sat at 6 AM UTC
+    #
+    # Combined schedule (daily is simplest and ensures no misses):
+    - cron: '0 6 * * *'    # Daily at 6 AM UTC (1 AM ET)
+  workflow_dispatch: # Allow manual trigger from GitHub Actions UI
 
 permissions:
   contents: write
@@ -12,6 +18,8 @@ permissions:
 jobs:
   update-data:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,6 +40,10 @@ jobs:
         id: check_changes
         run: |
           git diff --quiet src/data/ || echo "changes=true" >> $GITHUB_OUTPUT
+
+      - name: Verify build succeeds
+        if: steps.check_changes.outputs.changes == 'true'
+        run: npm run build
 
       - name: Commit and push changes
         if: steps.check_changes.outputs.changes == 'true'
