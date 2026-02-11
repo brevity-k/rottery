@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 interface BlogPost {
   slug: string;
   title: string;
@@ -7,7 +10,7 @@ interface BlogPost {
   content: string;
 }
 
-const posts: BlogPost[] = [
+const seedPosts: BlogPost[] = [
   {
     slug: 'how-powerball-works',
     title: 'How Powerball Works: Complete Guide',
@@ -189,14 +192,33 @@ const posts: BlogPost[] = [
   },
 ];
 
+function loadGeneratedPosts(): BlogPost[] {
+  const blogDir = path.join(process.cwd(), 'content', 'blog');
+  try {
+    const files = fs.readdirSync(blogDir).filter(f => f.endsWith('.json'));
+    return files.map(file => {
+      const raw = fs.readFileSync(path.join(blogDir, file), 'utf-8');
+      return JSON.parse(raw) as BlogPost;
+    });
+  } catch {
+    return [];
+  }
+}
+
+function getAllPosts(): BlogPost[] {
+  const generated = loadGeneratedPosts();
+  const all = [...seedPosts, ...generated];
+  return all.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+
 export function getBlogPost(slug: string): BlogPost | undefined {
-  return posts.find(p => p.slug === slug);
+  return getAllPosts().find(p => p.slug === slug);
 }
 
 export function getAllBlogSlugs(): string[] {
-  return posts.map(p => p.slug);
+  return getAllPosts().map(p => p.slug);
 }
 
 export function getAllBlogPosts(): BlogPost[] {
-  return posts;
+  return getAllPosts();
 }
