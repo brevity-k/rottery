@@ -36,10 +36,17 @@ jobs:
       - name: Fetch latest lottery data
         run: npx tsx scripts/update-data.ts
 
+      - name: Generate daily blog post
+        if: ${{ env.ANTHROPIC_API_KEY != '' }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: npx tsx scripts/generate-blog-post.ts
+
       - name: Check for changes
         id: check_changes
         run: |
-          git diff --quiet src/data/ || echo "changes=true" >> $GITHUB_OUTPUT
+          git diff --quiet src/data/ content/blog/ || echo "changes=true" >> $GITHUB_OUTPUT
+          git ls-files --others --exclude-standard src/data/ content/blog/ | grep -q . && echo "changes=true" >> $GITHUB_OUTPUT || true
 
       - name: Verify build succeeds
         if: steps.check_changes.outputs.changes == 'true'
@@ -50,6 +57,6 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add src/data/
-          git commit -m "chore: update lottery data $(date -u +%Y-%m-%d)"
+          git add src/data/ content/blog/
+          git commit -m "chore: update lottery data & blog $(date -u +%Y-%m-%d)"
           git push
