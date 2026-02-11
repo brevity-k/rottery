@@ -73,11 +73,11 @@ const posts: BlogPost[] = [
       <p>Powerball and Mega Millions are the two largest multi-state lottery games in the United States.</p>
       <h2>Game Format Comparison</h2>
       <p><strong>Powerball:</strong> 5 numbers from 1-69 + 1 Powerball from 1-26. Cost: $2.</p>
-      <p><strong>Mega Millions:</strong> 5 numbers from 1-70 + 1 Mega Ball from 1-25. Cost: $2.</p>
+      <p><strong>Mega Millions (since April 2025):</strong> 5 numbers from 1-70 + 1 Mega Ball from 1-24. Cost: $5 with automatic multiplier.</p>
       <h2>Odds Comparison</h2>
       <p><strong>Powerball jackpot odds:</strong> 1 in 292,201,338</p>
-      <p><strong>Mega Millions jackpot odds:</strong> 1 in 302,575,350</p>
-      <p>Powerball has slightly better jackpot odds. However, both games have extremely long odds.</p>
+      <p><strong>Mega Millions jackpot odds:</strong> 1 in 290,472,336 (improved in April 2025 from 1 in 302,575,350)</p>
+      <p>Since the April 2025 overhaul, Mega Millions now has slightly better jackpot odds than Powerball. However, Mega Millions tickets cost $5 vs $2 for Powerball.</p>
       <h2>Drawing Schedule</h2>
       <p><strong>Powerball:</strong> Monday, Wednesday, Saturday</p>
       <p><strong>Mega Millions:</strong> Tuesday, Friday</p>
@@ -139,10 +139,12 @@ const posts: BlogPost[] = [
       <p>US lottery jackpots have grown dramatically, with several prizes exceeding $1 billion.</p>
       <h2>Top Jackpots</h2>
       <ol>
-        <li><strong>$2.04 Billion (Powerball, Nov 2022):</strong> Won in California - the largest US lottery jackpot.</li>
+        <li><strong>$2.04 Billion (Powerball, Nov 2022):</strong> Won in California - the largest US lottery jackpot ever.</li>
+        <li><strong>$1.817 Billion (Powerball, Dec 2025):</strong> Won in Arkansas.</li>
+        <li><strong>$1.787 Billion (Powerball, Sept 2025):</strong> Won in Missouri and Texas (split).</li>
         <li><strong>$1.765 Billion (Powerball, Oct 2023):</strong> Won in California.</li>
         <li><strong>$1.602 Billion (Mega Millions, Aug 2023):</strong> Won in Florida.</li>
-        <li><strong>$1.586 Billion (Powerball, Jan 2016):</strong> Split three ways.</li>
+        <li><strong>$1.586 Billion (Powerball, Jan 2016):</strong> Split three ways (CA, FL, TN).</li>
         <li><strong>$1.537 Billion (Mega Millions, Oct 2018):</strong> Won in South Carolina.</li>
       </ol>
       <h2>Why Are Jackpots Getting Bigger?</h2>
@@ -157,15 +159,15 @@ const posts: BlogPost[] = [
     category: 'Guides',
     content: `
       <h2>What is Mega Millions?</h2>
-      <p>Mega Millions is available in 45 states, Washington D.C., and the U.S. Virgin Islands.</p>
-      <h2>How to Play</h2>
-      <p>Each ticket costs $2. Players choose 5 numbers from 1-70 and 1 Mega Ball from 1-25.</p>
+      <p>Mega Millions is available in 45 states, Washington D.C., and the U.S. Virgin Islands. The game was overhauled in April 2025 with a new format and pricing.</p>
+      <h2>How to Play (Since April 2025)</h2>
+      <p>Each ticket costs $5. Players choose 5 numbers from 1-70 and 1 Mega Ball from 1-24. Every play now includes an automatic multiplier (2x-10x) for non-jackpot prizes.</p>
       <h2>Drawing Schedule</h2>
       <p>Drawings are held Tuesday and Friday at 11:00 PM ET.</p>
-      <h2>Megaplier Option</h2>
-      <p>For an extra $1, multiply non-jackpot prizes by 2x, 3x, 4x, or 5x.</p>
+      <h2>Automatic Multiplier</h2>
+      <p>The old $1 Megaplier add-on was retired. Now every ticket automatically includes a random multiplier of 2x, 3x, 4x, 5x, or 10x for non-jackpot prizes.</p>
       <h2>Odds</h2>
-      <p>Jackpot odds: 1 in 302,575,350. Overall odds of any prize: approximately 1 in 24.</p>
+      <p>Jackpot odds: 1 in 290,472,336 (improved from 1 in 302,575,350). Starting jackpot: $50 million (up from $20 million).</p>
     `,
   },
   {
