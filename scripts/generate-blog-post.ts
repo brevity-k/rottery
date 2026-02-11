@@ -213,7 +213,7 @@ async function main() {
   };
 
   // Build prompt
-  const prompt = `You are a lottery statistics blogger for Rottery.com, an SEO-optimized lottery information website.
+  const prompt = `You are a lottery statistics blogger for Lottery.com, an SEO-optimized lottery information website.
 
 Generate a unique, data-driven blog post based on the data and topic below.
 

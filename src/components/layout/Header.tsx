@@ -10,7 +10,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center space-x-2">
             <span className="text-2xl font-bold text-blue-600">🎰</span>
-            <span className="text-xl font-bold text-gray-900">Rottery</span>
+            <span className="text-xl font-bold text-gray-900">Lottery</span>
           </Link>
 
           <nav className="hidden md:flex items-center space-x-6">
@@ -26,6 +26,9 @@ export default function Header() {
             <ToolsDropdown />
             <Link href="/blog" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
               Blog
+            </Link>
+            <Link href="/contact" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
+              Contact
             </Link>
           </nav>
 
@@ -89,6 +92,9 @@ function MobileMenu({ lotteries }: { lotteries: ReturnType<typeof getAllLotterie
           <div className="border-t border-gray-100 my-1" />
           <Link href="/blog" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
             Blog
+          </Link>
+          <Link href="/contact" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+            Contact
           </Link>
         </div>
       </details>
