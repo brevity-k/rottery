@@ -14,8 +14,6 @@ export const metadata: Metadata = {
     title: `Lottery Tax Calculator by State | ${SITE_NAME}`,
     description: 'Calculate your lottery winnings after federal and state taxes. Compare lump sum vs annuity payouts.',
     url: `${SITE_URL}/tools/tax-calculator`,
-    siteName: SITE_NAME,
-    type: 'website',
   },
   alternates: {
     canonical: `${SITE_URL}/tools/tax-calculator`,
@@ -35,7 +33,6 @@ export default function TaxCalculatorPage() {
       })} />
       <JsonLd data={breadcrumbSchema([
         { name: 'Home', url: SITE_URL },
-        { name: 'Tools', url: `${SITE_URL}/tools/tax-calculator` },
         { name: 'Tax Calculator', url: `${SITE_URL}/tools/tax-calculator` },
       ])} />
 

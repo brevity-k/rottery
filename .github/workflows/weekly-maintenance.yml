@@ -6,6 +6,10 @@ on:
     - cron: '0 8 * * 1'
   workflow_dispatch: # Allow manual trigger
 
+concurrency:
+  group: weekly-maintenance
+  cancel-in-progress: false
+
 permissions:
   contents: write
   issues: write
@@ -167,7 +171,7 @@ jobs:
         with:
           script: |
             const title = '[Auto] SEO health check failed';
-            const label = 'seo-health';
+            const label = 'automation-failure';
             const { data: issues } = await github.rest.issues.listForRepo({
               ...context.repo,
               state: 'open',
@@ -221,6 +225,13 @@ jobs:
         if: steps.check_quarter.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         run: npm ci
 
+      - name: Verify Claude API key
+        if: steps.check_quarter.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "::warning::ANTHROPIC_API_KEY is not set — quarterly tax update will be skipped"
+          fi
+
       - name: Update tax rates via Claude API
         if: (steps.check_quarter.outputs.run == 'true' || github.event_name == 'workflow_dispatch') && env.ANTHROPIC_API_KEY != ''
         env:
@@ -235,14 +246,19 @@ jobs:
 
       - name: Verify build succeeds
         if: steps.check_changes.outputs.changes == 'true'
-        run: npm run build
+        run: npm run build && npx tsx scripts/validate-build.ts
+
+      - name: Sync CLAUDE.md stats
+        if: steps.check_changes.outputs.changes == 'true'
+        run: npx tsx scripts/sync-claude-md.ts
 
       - name: Commit and push tax rate updates
         if: steps.check_changes.outputs.changes == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add src/data/state-tax-rates.ts
+          git add src/data/state-tax-rates.ts CLAUDE.md
+          git pull --rebase origin main
           git commit -m "chore: quarterly tax rate update $(date -u +%Y-%m-%d)"
           git push
 
@@ -306,6 +322,13 @@ jobs:
         if: steps.check_quarter.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         run: npm ci
 
+      - name: Verify Claude API key
+        if: steps.check_quarter.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "::warning::ANTHROPIC_API_KEY is not set — quarterly state refresh will be skipped"
+          fi
+
       - name: Generate state configs
         if: (steps.check_quarter.outputs.run == 'true' || github.event_name == 'workflow_dispatch') && env.ANTHROPIC_API_KEY != ''
         env:
@@ -320,14 +343,19 @@ jobs:
 
       - name: Verify build succeeds
         if: steps.check_changes.outputs.changes == 'true'
-        run: npm run build
+        run: npm run build && npx tsx scripts/validate-build.ts
+
+      - name: Sync CLAUDE.md stats
+        if: steps.check_changes.outputs.changes == 'true'
+        run: npx tsx scripts/sync-claude-md.ts
 
       - name: Commit and push state config updates
         if: steps.check_changes.outputs.changes == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add src/lib/states/config.ts
+          git add src/lib/states/config.ts CLAUDE.md
+          git pull --rebase origin main
           git commit -m "chore: quarterly state config refresh $(date -u +%Y-%m-%d)"
           git push
 

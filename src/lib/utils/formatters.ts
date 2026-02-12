@@ -79,6 +79,18 @@ export function formatLastUpdated(isoString: string): string {
 }
 
 /**
+ * Estimates reading time from HTML content.
+ * Strips tags, counts words, assumes 200 WPM.
+ * Example: 800 words -> "4 min read"
+ */
+export function calculateReadingTime(html: string): string {
+  const text = html.replace(/<[^>]*>/g, '');
+  const words = text.split(/\s+/).filter(w => w.length > 0).length;
+  const minutes = Math.max(1, Math.round(words / 200));
+  return `${minutes} min read`;
+}
+
+/**
  * Extracts an array of unique years from draw results, sorted descending.
  * Example: draws from 2020-2024 -> [2024, 2023, 2022, 2021, 2020]
  */

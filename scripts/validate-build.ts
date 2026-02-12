@@ -12,23 +12,12 @@
 
 import fs from 'fs';
 import path from 'path';
+import { MIN_DRAWS, MIN_PAGES } from './lib/constants';
 
 const ROOT = process.cwd();
 const DATA_DIR = path.join(ROOT, 'src', 'data');
 const BLOG_DIR = path.join(ROOT, 'content', 'blog');
 const BUILD_DIR = path.join(ROOT, '.next', 'server', 'app');
-
-// Minimum draw counts per game (safety floor — should never drop below these)
-const MIN_DRAWS: Record<string, number> = {
-  'powerball.json': 1800,
-  'mega-millions.json': 2400,
-  'cash4life.json': 2900,
-  'ny-lotto.json': 2500,
-  'take5.json': 12000,
-};
-
-// Minimum page count — derived from: 5 games × ~80 pages each + ~410 number pages + states + tools + blog + static
-const MIN_PAGES = 550;
 
 let failed = false;
 

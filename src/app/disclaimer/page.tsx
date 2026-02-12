@@ -7,6 +7,12 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs';
 export const metadata: Metadata = {
   title: `Disclaimer`,
   description: `${SITE_NAME} disclaimer. Important information about our lottery statistics and number recommendations.`,
+  openGraph: {
+    title: 'Disclaimer',
+    description: `${SITE_NAME} disclaimer. Important information about our lottery statistics and number recommendations.`,
+    url: `${SITE_URL}/disclaimer`,
+  },
+  alternates: { canonical: `${SITE_URL}/disclaimer` },
 };
 
 export default function DisclaimerPage() {

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { SITE_NAME, SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
+import { calculateReadingTime } from '@/lib/utils/formatters';
 import { breadcrumbSchema, articleSchema } from '@/lib/seo/structuredData';
 import { getBlogPost, getAllBlogSlugs } from '@/lib/blog';
 import JsonLd from '@/components/seo/JsonLd';
@@ -80,7 +81,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${getCategoryStyle(post.category)}`}>
                 {post.category}
               </span>
-              <time className="text-sm text-gray-400" dateTime={post.date}>{formatDate(post.date)}</time>
+              <time className="text-sm text-gray-400" dateTime={post.date}>{formatDate(post.date)} · {calculateReadingTime(post.content)}</time>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 leading-tight">{post.title}</h1>
             <p className="text-lg text-gray-500 leading-relaxed">{post.description}</p>

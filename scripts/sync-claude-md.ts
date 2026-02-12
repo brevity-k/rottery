@@ -154,10 +154,16 @@ function main() {
 
   // Apply specific pattern replacements
   let changes = 0;
+  let warnings = 0;
   for (const r of replacements) {
     if (r.pattern.global) {
       // For global patterns, only replace in specific contexts
       // Skip the state count global replacement — too risky to replace all occurrences
+      continue;
+    }
+    if (!r.pattern.test(content)) {
+      console.warn(`  ⚠ Pattern not found: ${r.label} — CLAUDE.md format may have changed`);
+      warnings++;
       continue;
     }
     const before = content;
@@ -197,6 +203,15 @@ function main() {
   } else {
     console.log('\nCLAUDE.md already up to date — no changes needed.');
   }
+
+  if (warnings > 0) {
+    console.warn(`\n${warnings} pattern(s) not found — CLAUDE.md may need manual review.`);
+  }
 }
 
-main();
+try {
+  main();
+} catch (err) {
+  console.error('sync-claude-md failed:', err);
+  process.exit(1);
+}

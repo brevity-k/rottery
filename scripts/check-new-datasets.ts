@@ -9,14 +9,7 @@
  */
 
 import { withRetry } from './lib/retry';
-
-const KNOWN_DATASETS: Record<string, string> = {
-  'd6yy-54nr': 'Powerball',
-  '5xaw-6ayf': 'Mega Millions',
-  'kwxv-fwze': 'Cash4Life',
-  '6nbc-h7bj': 'NY Lotto',
-  'dg63-4siq': 'Take 5',
-};
+import { DATASET_ID_TO_GAME, RETRY_PRESETS } from './lib/constants';
 
 const LOTTERY_SEARCH_TERMS = [
   'lottery', 'lotto', 'winning numbers', 'draw', 'jackpot',
@@ -46,7 +39,7 @@ async function searchSodaCatalog(): Promise<SodaCatalogEntry[]> {
           if (!r.ok) throw new Error(`HTTP ${r.status}`);
           return r;
         }),
-        { maxAttempts: 2, baseDelayMs: 1000, label: `SODA catalog search "${term}"` }
+        { ...RETRY_PRESETS.SODA_CATALOG, label: `SODA catalog search "${term}"` }
       );
 
       const data = await response.json();
@@ -77,26 +70,60 @@ async function createGitHubIssue(title: string, body: string): Promise<void> {
     return;
   }
 
-  const response = await fetch(`https://api.github.com/repos/${repo}/issues`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      title,
-      body,
-      labels: ['automation', 'new-dataset'],
-    }),
-  });
-
-  if (response.ok) {
-    const issue = await response.json();
-    console.log(`Created GitHub Issue #${issue.number}: ${title}`);
-  } else {
-    console.error(`Failed to create issue: ${response.status}`);
-    console.log(`Title: ${title}\nBody:\n${body}`);
+  // Check for existing open issue with new-dataset label to prevent duplicates
+  try {
+    const searchResponse = await withRetry(
+      () => fetch(
+        `https://api.github.com/repos/${repo}/issues?state=open&labels=new-dataset&per_page=10`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      ).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r; }),
+      { ...RETRY_PRESETS.GITHUB_API, label: 'GitHub issue search' }
+    );
+    const openIssues = await searchResponse.json();
+    if (Array.isArray(openIssues) && openIssues.length > 0) {
+      // Comment on existing issue instead of creating a new one
+      const existingIssue = openIssues[0];
+      const commentResponse = await withRetry(
+        () => fetch(
+          `https://api.github.com/repos/${repo}/issues/${existingIssue.number}/comments`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ body: `## Updated Scan Results\n\n${body}` }),
+          }
+        ).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r; }),
+        { ...RETRY_PRESETS.GITHUB_API, label: 'GitHub issue comment' }
+      );
+      if (commentResponse.ok) {
+        console.log(`Updated existing issue #${existingIssue.number} with new scan results`);
+        return;
+      }
+    }
+  } catch {
+    // Fall through to create new issue
   }
+
+  const response = await withRetry(
+    () => fetch(`https://api.github.com/repos/${repo}/issues`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title,
+        body,
+        labels: ['automation', 'new-dataset'],
+      }),
+    }).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r; }),
+    { ...RETRY_PRESETS.GITHUB_API, label: 'GitHub issue create' }
+  );
+
+  const issue = await response.json();
+  console.log(`Created GitHub Issue #${issue.number}: ${title}`);
 }
 
 async function main() {
@@ -107,7 +134,7 @@ async function main() {
 
   const newDatasets = catalogEntries.filter(entry => {
     const id = entry.resource.id;
-    return !KNOWN_DATASETS[id];
+    return !DATASET_ID_TO_GAME[id];
   });
 
   // Filter to only datasets that look like they contain winning numbers
@@ -174,4 +201,7 @@ ${relevantNew.map(e => `### ${e.resource.name}
   }
 }
 
-main().catch(console.error);
+main().catch((err) => {
+  console.error('check-new-datasets failed:', err);
+  process.exit(1);
+});

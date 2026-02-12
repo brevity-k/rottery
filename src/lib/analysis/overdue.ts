@@ -14,7 +14,7 @@ export function calculateOverdue(
     let totalAppearances = 0;
 
     for (let i = 0; i < draws.length; i++) {
-      const nums = type === 'main' ? draws[i].numbers : [draws[i].bonusNumber];
+      const nums = type === 'main' ? draws[i].numbers : (draws[i].bonusNumber !== null ? [draws[i].bonusNumber] : []);
       if (nums.includes(num)) {
         if (totalAppearances === 0) {
           drawsSinceLastDrawn = i;

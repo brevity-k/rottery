@@ -8,6 +8,12 @@ import ContactForm from '@/components/contact/ContactForm';
 export const metadata: Metadata = {
   title: `Contact Us - ${SITE_NAME}`,
   description: `Have a question or feedback? Get in touch with the ${SITE_NAME} team. We typically respond within 1-2 business days.`,
+  openGraph: {
+    title: `Contact Us - ${SITE_NAME}`,
+    description: `Have a question or feedback? Get in touch with the ${SITE_NAME} team. We typically respond within 1-2 business days.`,
+    url: `${SITE_URL}/contact`,
+  },
+  alternates: { canonical: `${SITE_URL}/contact` },
 };
 
 export default function ContactPage() {

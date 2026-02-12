@@ -13,7 +13,7 @@ interface LotteryConfig {
 interface DrawResult {
   date: string;
   numbers: number[];
-  bonusNumber: number;
+  bonusNumber: number | null;
   drawTime?: 'midday' | 'evening';
 }
 
@@ -189,7 +189,7 @@ export default function TicketChecker({ lotteries, drawsByGame }: TicketCheckerP
                 <LotteryBall key={i} number={n} type="main" size="md" />
               ))}
               {hasBonus && (
-                <LotteryBall number={result.draw.bonusNumber} type="bonus" size="md" />
+                <LotteryBall number={result.draw.bonusNumber!} type="bonus" size="md" />
               )}
             </div>
           </div>

@@ -14,7 +14,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import fs from 'fs';
 import path from 'path';
 import { withRetry } from './lib/retry';
-import { CLAUDE_MODEL } from './lib/constants';
+import { CLAUDE_MODEL, RETRY_PRESETS } from './lib/constants';
 
 interface TaxRateUpdate {
   abbreviation: string;
@@ -92,7 +92,7 @@ If no changes are needed, return {"updates": [], "noChanges": true, "notes": "Al
       max_tokens: 2048,
       messages: [{ role: 'user', content: prompt }],
     }),
-    { maxAttempts: 2, baseDelayMs: 3000, label: 'Claude tax rate query' }
+    { ...RETRY_PRESETS.CLAUDE_API, label: 'Claude tax rate query' }
   );
 
   const text = message.content[0].type === 'text' ? message.content[0].text : '';
@@ -178,4 +178,7 @@ If no changes are needed, return {"updates": [], "noChanges": true, "notes": "Al
   }
 }
 
-main().catch(console.error);
+main().catch((err) => {
+  console.error('update-tax-rates failed:', err);
+  process.exit(1);
+});

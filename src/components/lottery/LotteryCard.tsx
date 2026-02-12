@@ -28,7 +28,7 @@ export default function LotteryCard({ lottery, latestDraw }: LotteryCardProps) {
               {latestDraw.numbers.map((num, i) => (
                 <LotteryBall key={i} number={num} type="main" color={lottery.colors.ball} />
               ))}
-              {lottery.bonusNumber.count > 0 && (
+              {lottery.bonusNumber.count > 0 && latestDraw.bonusNumber !== null && (
                 <LotteryBall number={latestDraw.bonusNumber} type="bonus" color={lottery.colors.bonusBall} />
               )}
             </div>

@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { getLottery, getAllLotterySlugs } from '@/lib/lotteries/config';
 import { loadLotteryData } from '@/lib/data/fetcher';
 import { generateLotteryMetadata } from '@/lib/seo/metadata';
-import { breadcrumbSchema } from '@/lib/seo/structuredData';
-import { SITE_URL } from '@/lib/utils/constants';
+import { breadcrumbSchema, datasetSchema } from '@/lib/seo/structuredData';
+import { SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
 import { getYearsRange, formatLastUpdated } from '@/lib/utils/formatters';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import ResultsTable from '@/components/lottery/ResultsTable';
@@ -46,6 +46,15 @@ export default async function ResultsPage({ params }: { params: Promise<{ lotter
         { name: lottery.name, url: `${SITE_URL}/${lottery.slug}` },
         { name: 'Results', url: `${SITE_URL}/${lottery.slug}/results` },
       ])} />
+      {draws.length > 0 && (
+        <JsonLd data={datasetSchema({
+          name: `${lottery.name} Winning Numbers History`,
+          description: `Complete historical draw results for ${lottery.name}, including winning numbers${lottery.bonusNumber.count > 0 ? ` and ${lottery.bonusNumber.label}` : ''}.`,
+          url: `${SITE_URL}/${lottery.slug}/results`,
+          recordCount: draws.length,
+          dateRange: `${draws[draws.length - 1]?.date}/${draws[0]?.date}`,
+        })} />
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Breadcrumbs items={[
@@ -92,6 +101,8 @@ export default async function ResultsPage({ params }: { params: Promise<{ lotter
             <p className="text-center text-gray-500 py-8">No results data available yet. Run the data update script to fetch historical data.</p>
           </Card>
         )}
+
+        <p className="mt-8 text-center text-sm text-gray-500">{DISCLAIMER_TEXT}</p>
       </div>
     </>
   );

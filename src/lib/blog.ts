@@ -288,15 +288,29 @@ const seedPosts: BlogPost[] = [
 
 function loadGeneratedPosts(): BlogPost[] {
   const blogDir = path.join(process.cwd(), 'content', 'blog');
+  let files: string[];
   try {
-    const files = fs.readdirSync(blogDir).filter(f => f.endsWith('.json'));
-    return files.map(file => {
-      const raw = fs.readFileSync(path.join(blogDir, file), 'utf-8');
-      return JSON.parse(raw) as BlogPost;
-    });
+    files = fs.readdirSync(blogDir).filter(f => f.endsWith('.json'));
   } catch {
+    // Directory doesn't exist yet (first run before any blog posts generated)
     return [];
   }
+
+  const posts: BlogPost[] = [];
+  for (const file of files) {
+    try {
+      const raw = fs.readFileSync(path.join(blogDir, file), 'utf-8');
+      const post = JSON.parse(raw) as BlogPost;
+      if (post.slug && post.title && post.content && post.date) {
+        posts.push(post);
+      } else {
+        console.warn(`Skipping blog post with missing fields: ${file}`);
+      }
+    } catch {
+      console.warn(`Skipping malformed blog post: ${file}`);
+    }
+  }
+  return posts;
 }
 
 function getAllPosts(): BlogPost[] {

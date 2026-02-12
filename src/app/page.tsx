@@ -2,6 +2,7 @@ import { getAllLotteries } from '@/lib/lotteries/config';
 import { loadLotteryData } from '@/lib/data/fetcher';
 import { generateHomeMetadata } from '@/lib/seo/metadata';
 import { websiteSchema } from '@/lib/seo/structuredData';
+import { DISCLAIMER_TEXT } from '@/lib/utils/constants';
 import LotteryCard from '@/components/lottery/LotteryCard';
 import JsonLd from '@/components/seo/JsonLd';
 import Link from 'next/link';
@@ -86,9 +87,7 @@ export default function HomePage() {
 
       {/* Disclaimer */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <p className="text-center text-sm text-gray-500">
-          For entertainment purposes only. Lottery outcomes are random. Past results do not influence future drawings.
-        </p>
+        <p className="text-center text-sm text-gray-500">{DISCLAIMER_TEXT}</p>
       </section>
     </>
   );

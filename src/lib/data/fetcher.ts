@@ -41,5 +41,12 @@ export function loadLotteryData(lotterySlug: string): LotteryData {
   const fileContents = fs.readFileSync(filePath, 'utf-8');
   const data: LotteryData = JSON.parse(fileContents);
 
+  // Normalize legacy bonusNumber: 0 → null (no valid lottery uses 0 as a bonus number)
+  for (const draw of data.draws) {
+    if (draw.bonusNumber === 0) {
+      draw.bonusNumber = null;
+    }
+  }
+
   return data;
 }

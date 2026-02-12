@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lottery: 
   return {
     title,
     description,
-    openGraph: { title, description, url, siteName: SITE_NAME, type: 'website' },
+    openGraph: { title, description, url },
     alternates: { canonical: url },
   };
 }
@@ -113,7 +113,7 @@ export default async function NumberDetailPage({ params }: { params: Promise<{ l
     // Recent appearances (last 10)
     recentDraws = data.draws
       .filter(d => {
-        const nums = type === 'main' ? d.numbers : [d.bonusNumber];
+        const nums = type === 'main' ? d.numbers : (d.bonusNumber !== null ? [d.bonusNumber] : []);
         return nums.includes(number);
       })
       .slice(0, 10);
@@ -141,7 +141,7 @@ export default async function NumberDetailPage({ params }: { params: Promise<{ l
         ]} />
 
         <div className="flex items-center gap-4 mb-2">
-          <LotteryBall number={number} type={type} size="lg" />
+          <LotteryBall number={number} type={type} size="lg" color={type === 'bonus' ? lottery.colors.bonusBall : undefined} />
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
             {lottery.name} {label} #{number}
           </h1>
@@ -226,16 +226,14 @@ export default async function NumberDetailPage({ params }: { params: Promise<{ l
                         {n}
                       </span>
                     ))}
-                    {hasBonus && (
-                      <span
-                        className={`w-8 h-8 rounded-full inline-flex items-center justify-center text-xs font-bold ${
-                          draw.bonusNumber === number && type === 'bonus'
-                            ? 'bg-blue-600 text-white ring-2 ring-blue-300'
-                            : 'bg-red-500 text-white'
-                        }`}
-                      >
-                        {draw.bonusNumber}
-                      </span>
+                    {hasBonus && draw.bonusNumber !== null && (
+                      draw.bonusNumber === number && type === 'bonus' ? (
+                        <span className="w-8 h-8 rounded-full inline-flex items-center justify-center text-xs font-bold bg-blue-600 text-white ring-2 ring-blue-300">
+                          {draw.bonusNumber}
+                        </span>
+                      ) : (
+                        <LotteryBall number={draw.bonusNumber} type="bonus" size="sm" color={lottery.colors.bonusBall} />
+                      )
                     )}
                   </div>
                 </div>

@@ -36,13 +36,6 @@ export function generateLotteryMetadata(
       title: titles[page],
       description: descriptions[page],
       url,
-      siteName: SITE_NAME,
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: titles[page],
-      description: descriptions[page],
     },
     alternates: {
       canonical: url,
@@ -58,35 +51,9 @@ export function generateHomeMetadata(): Metadata {
       title: `${SITE_NAME} - AI-Powered Lottery Number Insights & Statistics`,
       description: SITE_DESCRIPTION,
       url: SITE_URL,
-      siteName: SITE_NAME,
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `${SITE_NAME} - AI-Powered Lottery Number Insights & Statistics`,
-      description: SITE_DESCRIPTION,
-    },
-  };
-}
-
-export function generateBlogMetadata(title: string, description: string, slug: string): Metadata {
-  return {
-    title: `${title} | ${SITE_NAME}`,
-    description,
-    openGraph: {
-      title: `${title} | ${SITE_NAME}`,
-      description,
-      url: `${SITE_URL}/blog/${slug}`,
-      siteName: SITE_NAME,
-      type: 'article',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `${title} | ${SITE_NAME}`,
-      description,
     },
     alternates: {
-      canonical: `${SITE_URL}/blog/${slug}`,
+      canonical: SITE_URL,
     },
   };
 }

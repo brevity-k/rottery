@@ -14,8 +14,6 @@ export const metadata: Metadata = {
     title: `US Lottery by State | ${SITE_NAME}`,
     description: 'Find lottery information for every US state. Tax rates, available games, and claim procedures.',
     url: `${SITE_URL}/states`,
-    siteName: SITE_NAME,
-    type: 'website',
   },
   alternates: { canonical: `${SITE_URL}/states` },
 };

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { getAllLotteries } from '@/lib/lotteries/config';
 import { softwareAppSchema, breadcrumbSchema, faqSchema } from '@/lib/seo/structuredData';
 import { getNumberGeneratorFaqs } from '@/lib/seo/faqContent';
-import { SITE_NAME, SITE_URL } from '@/lib/utils/constants';
+import { SITE_NAME, SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
 import NumberGenerator from '@/components/numbers/NumberGenerator';
 import JsonLd from '@/components/seo/JsonLd';
 import FAQSection from '@/components/seo/FAQSection';
@@ -12,6 +12,12 @@ import Card from '@/components/ui/Card';
 export const metadata: Metadata = {
   title: `Lottery Number Generator - Free Random Numbers | ${SITE_NAME}`,
   description: 'Generate random lottery numbers for any US lottery. Uses cryptographically secure randomization for Powerball, Mega Millions, and more.',
+  openGraph: {
+    title: `Lottery Number Generator | ${SITE_NAME}`,
+    description: 'Generate random lottery numbers for any US lottery. Uses cryptographically secure randomization for Powerball, Mega Millions, and more.',
+    url: `${SITE_URL}/tools/number-generator`,
+  },
+  alternates: { canonical: `${SITE_URL}/tools/number-generator` },
 };
 
 export default function NumberGeneratorPage() {
@@ -28,7 +34,6 @@ export default function NumberGeneratorPage() {
       })} />
       <JsonLd data={breadcrumbSchema([
         { name: 'Home', url: SITE_URL },
-        { name: 'Tools', url: `${SITE_URL}/tools/number-generator` },
         { name: 'Number Generator', url: `${SITE_URL}/tools/number-generator` },
       ])} />
 
@@ -74,6 +79,10 @@ export default function NumberGeneratorPage() {
         </Card>
 
         <FAQSection faqs={faqs} />
+
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center mt-8">
+          <p className="text-sm text-amber-800">{DISCLAIMER_TEXT}</p>
+        </div>
       </div>
     </>
   );

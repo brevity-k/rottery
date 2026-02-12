@@ -14,7 +14,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import fs from 'fs';
 import path from 'path';
 import { withRetry } from './lib/retry';
-import { CLAUDE_MODEL } from './lib/constants';
+import { CLAUDE_MODEL, RETRY_PRESETS } from './lib/constants';
 
 const ROOT = process.cwd();
 const TAX_FILE = path.join(ROOT, 'src', 'data', 'state-tax-rates.ts');
@@ -178,7 +178,7 @@ Respond with ONLY valid JSON array (no markdown fences, no explanation):
       max_tokens: 4096,
       messages: [{ role: 'user', content: prompt }],
     }),
-    { maxAttempts: 2, baseDelayMs: 3000, label: `Claude state config generation (${states.length} states)` }
+    { ...RETRY_PRESETS.CLAUDE_API, label: `Claude state config generation (${states.length} states)` }
   );
 
   const text = message.content[0].type === 'text' ? message.content[0].text : '';

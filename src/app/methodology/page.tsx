@@ -8,6 +8,11 @@ import Card from '@/components/ui/Card';
 export const metadata: Metadata = {
   title: `Our Methodology | ${SITE_NAME}`,
   description: 'Learn how My Lotto Stats calculates frequency analysis, hot & cold numbers, overdue detection, pair analysis, and statistical recommendations.',
+  openGraph: {
+    title: `Our Methodology | ${SITE_NAME}`,
+    description: 'Learn how My Lotto Stats calculates frequency analysis, hot & cold numbers, overdue detection, pair analysis, and statistical recommendations.',
+    url: `${SITE_URL}/methodology`,
+  },
   alternates: { canonical: `${SITE_URL}/methodology` },
 };
 

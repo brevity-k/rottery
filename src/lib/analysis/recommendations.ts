@@ -118,7 +118,7 @@ export function generateRecommendations(
 
     sets.push({
       numbers: selectedMain.map(s => s.number).sort((a, b) => a - b),
-      bonusNumber: selectedBonus ? selectedBonus.number : 0,
+      bonusNumber: selectedBonus ? selectedBonus.number : null,
       strategy: strategyConfig.name,
       reasoning,
       confidence: Math.round((selectedMain.reduce((sum, s) => sum + s.score, 0) / selectedMain.length) * 100),

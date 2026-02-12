@@ -12,7 +12,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import fs from 'fs';
 import path from 'path';
 import { withRetry } from './lib/retry';
-import { CLAUDE_MODEL } from './lib/constants';
+import { CLAUDE_MODEL, RETRY_PRESETS } from './lib/constants';
 
 const ROOT = process.cwd();
 const OUTPUT_FILE = path.join(ROOT, 'src', 'app', 'methodology', 'page.tsx');
@@ -75,7 +75,7 @@ Respond with ONLY the HTML content string (no markdown fences, no explanation). 
       max_tokens: 4096,
       messages: [{ role: 'user', content: prompt }],
     }),
-    { maxAttempts: 2, baseDelayMs: 3000, label: 'Claude methodology generation' }
+    { ...RETRY_PRESETS.CLAUDE_API, label: 'Claude methodology generation' }
   );
 
   let htmlContent = message.content[0].type === 'text' ? message.content[0].text : '';

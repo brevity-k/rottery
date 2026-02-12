@@ -14,6 +14,10 @@ on:
     - cron: '0 6 * * *'    # Daily at 6 AM UTC (1 AM ET)
   workflow_dispatch: # Allow manual trigger from GitHub Actions UI
 
+concurrency:
+  group: update-lottery-data
+  cancel-in-progress: false
+
 permissions:
   contents: write
   issues: write
@@ -132,8 +136,15 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add src/data/ content/blog/ CLAUDE.md
+          git pull --rebase origin main
           git commit -m "chore: update lottery data & blog $(date -u +%Y-%m-%d)"
           git push
+
+      - name: Propagate blog generation failure
+        if: always() && steps.blog_gen.outcome == 'failure'
+        run: |
+          echo "::error::Blog generation failed (data was committed successfully). See the blog generation notification issue for details."
+          exit 1
 
       - name: Notify on failure
         if: failure()

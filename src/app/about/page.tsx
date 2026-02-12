@@ -7,6 +7,12 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs';
 export const metadata: Metadata = {
   title: `About ${SITE_NAME}`,
   description: `Learn about ${SITE_NAME}, the AI-powered lottery statistics platform providing data-driven insights for US lotteries.`,
+  openGraph: {
+    title: `About ${SITE_NAME}`,
+    description: `Learn about ${SITE_NAME}, the AI-powered lottery statistics platform providing data-driven insights for US lotteries.`,
+    url: `${SITE_URL}/about`,
+  },
+  alternates: { canonical: `${SITE_URL}/about` },
 };
 
 export default function AboutPage() {

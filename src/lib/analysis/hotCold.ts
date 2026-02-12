@@ -45,7 +45,7 @@ export function calculateHotCold(
 
 function countOccurrences(draws: DrawResult[], number: number, type: 'main' | 'bonus'): number {
   return draws.filter(d => {
-    const nums = type === 'main' ? d.numbers : [d.bonusNumber];
+    const nums = type === 'main' ? d.numbers : (d.bonusNumber !== null ? [d.bonusNumber] : []);
     return nums.includes(number);
   }).length;
 }

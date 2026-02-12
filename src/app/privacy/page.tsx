@@ -7,6 +7,12 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs';
 export const metadata: Metadata = {
   title: `Privacy Policy`,
   description: `${SITE_NAME} privacy policy. Learn how we handle your data.`,
+  openGraph: {
+    title: 'Privacy Policy',
+    description: `${SITE_NAME} privacy policy. Learn how we handle your data.`,
+    url: `${SITE_URL}/privacy`,
+  },
+  alternates: { canonical: `${SITE_URL}/privacy` },
 };
 
 export default function PrivacyPage() {

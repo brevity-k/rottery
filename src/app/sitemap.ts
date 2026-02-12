@@ -1,5 +1,7 @@
 import { MetadataRoute } from 'next';
 import { getAllLotteries } from '@/lib/lotteries/config';
+import { loadLotteryData } from '@/lib/data/fetcher';
+import { getYearsRange } from '@/lib/utils/formatters';
 import { getAllBlogSlugs } from '@/lib/blog';
 import { getAllStateSlugs } from '@/lib/states/config';
 import { SITE_URL } from '@/lib/utils/constants';
@@ -49,6 +51,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
+  const yearPages: MetadataRoute.Sitemap = lotteries.flatMap(lottery => {
+    try {
+      const data = loadLotteryData(lottery.slug);
+      const years = getYearsRange(data.draws);
+      return years.map(year => ({
+        url: `${SITE_URL}/${lottery.slug}/results/${year}`,
+        lastModified: now,
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+      }));
+    } catch {
+      return [];
+    }
+  });
+
   const numberPages: MetadataRoute.Sitemap = lotteries.flatMap(lottery => {
     const mainPages = Array.from({ length: lottery.mainNumbers.max }, (_, i) => ({
       url: `${SITE_URL}/${lottery.slug}/numbers/main-${i + 1}`,
@@ -67,5 +84,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     return [...mainPages, ...bonusPages];
   });
 
-  return [...staticPages, ...lotteryPages, ...numberPages, ...blogPages, ...statePages];
+  return [...staticPages, ...lotteryPages, ...yearPages, ...numberPages, ...blogPages, ...statePages];
 }

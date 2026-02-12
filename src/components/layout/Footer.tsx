@@ -28,6 +28,7 @@ export default function Footer() {
               <li><Link href="/tools/tax-calculator" className="hover:text-white transition-colors">Tax Calculator</Link></li>
               <li><Link href="/tools/number-generator" className="hover:text-white transition-colors">Number Generator</Link></li>
               <li><Link href="/tools/odds-calculator" className="hover:text-white transition-colors">Odds Calculator</Link></li>
+              <li><Link href="/tools/ticket-checker" className="hover:text-white transition-colors">Ticket Checker</Link></li>
             </ul>
             <h4 className="text-white font-semibold mb-4 mt-6">States</h4>
             <ul className="space-y-2 text-sm">

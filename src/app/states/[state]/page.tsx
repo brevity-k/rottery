@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ state: st
   return {
     title,
     description,
-    openGraph: { title, description, url: `${SITE_URL}/states/${slug}`, siteName: SITE_NAME, type: 'website' },
+    openGraph: { title, description, url: `${SITE_URL}/states/${slug}` },
     alternates: { canonical: `${SITE_URL}/states/${slug}` },
   };
 }

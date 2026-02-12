@@ -19,7 +19,7 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { withRetry } from './lib/retry';
-import { CLAUDE_MODEL } from './lib/constants';
+import { CLAUDE_MODEL, RETRY_PRESETS } from './lib/constants';
 
 const ROOT = process.cwd();
 const CONFIG_FILE = path.join(ROOT, 'src', 'lib', 'lotteries', 'config.ts');
@@ -51,7 +51,7 @@ async function main() {
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r;
     }),
-    { maxAttempts: 3, baseDelayMs: 2000, label: 'SODA sample fetch' }
+    { ...RETRY_PRESETS.SODA_DATA, label: 'SODA sample fetch' }
   );
 
   const sampleData: SodaRecord[] = await response.json();
@@ -141,7 +141,7 @@ Respond with JSON (no markdown fences):
       max_tokens: 4096,
       messages: [{ role: 'user', content: prompt }],
     }),
-    { maxAttempts: 2, baseDelayMs: 3000, label: 'Claude game analysis' }
+    { ...RETRY_PRESETS.CLAUDE_API, label: 'Claude game analysis' }
   );
 
   const text = message.content[0].type === 'text' ? message.content[0].text : '';
@@ -190,12 +190,14 @@ Respond with JSON (no markdown fences):
       `## Generated Config\n\n` +
       `See \`${slug}-config.json\` for the generated LotteryConfig and LotterySource.\n\n` +
       `## Manual Steps Required\n\n` +
-      `1. Add LotteryConfig to \`src/lib/lotteries/config.ts\`\n` +
-      `2. Add LotterySource to \`scripts/update-data.ts\`\n` +
-      `3. Add parser handling in \`src/lib/data/parser.ts\` if needed\n` +
-      `4. Update CLAUDE.md with the new game\n` +
-      `5. Run \`npx tsx scripts/update-data.ts\` to fetch initial data\n` +
-      `6. Run \`npm run build\` to verify\n\n` +
+      `1. Add game to \`KNOWN_DATASETS\` in \`scripts/lib/constants.ts\` (single source of truth)\n` +
+      `2. Add \`VALIDATION_CONFIG\` entry in \`scripts/update-data.ts\`\n` +
+      `3. Add LotteryConfig to \`src/lib/lotteries/config.ts\`\n` +
+      `4. Add parser handling in \`src/lib/data/parser.ts\` if needed\n` +
+      `5. Add game to \`GAMES\` array in \`scripts/generate-blog-post.ts\`\n` +
+      `6. Update CLAUDE.md with the new game\n` +
+      `7. Run \`npx tsx scripts/update-data.ts\` to fetch initial data\n` +
+      `8. Run \`npm run build\` to verify\n\n` +
       `## Claude's Notes\n\n${result.notes}\n`
     );
 
@@ -235,7 +237,7 @@ Respond with JSON (no markdown fences):
     execSync('git checkout main', { cwd: ROOT, stdio: 'pipe' });
 
     console.log('PR created successfully.');
-  } catch (e) {
+  } catch {
     console.log('\nCould not create PR (gh CLI not available or not in git repo).');
     console.log('Config file saved for manual review:', outputPath);
   }

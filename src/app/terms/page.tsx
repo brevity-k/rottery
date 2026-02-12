@@ -7,6 +7,12 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs';
 export const metadata: Metadata = {
   title: `Terms of Service`,
   description: `${SITE_NAME} terms of service. Understand the conditions for using our platform.`,
+  openGraph: {
+    title: 'Terms of Service',
+    description: `${SITE_NAME} terms of service. Understand the conditions for using our platform.`,
+    url: `${SITE_URL}/terms`,
+  },
+  alternates: { canonical: `${SITE_URL}/terms` },
 };
 
 export default function TermsPage() {

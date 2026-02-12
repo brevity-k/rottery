@@ -13,7 +13,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import fs from 'fs';
 import path from 'path';
 import { withRetry } from './lib/retry';
-import { CLAUDE_MODEL, SEASONAL_OVERRIDES, SPECIAL_TOPICS, TARGET_KEYWORDS } from './lib/constants';
+import { CLAUDE_MODEL, SEASONAL_OVERRIDES, SPECIAL_TOPICS, TARGET_KEYWORDS, BLOG_FORBIDDEN_TERMS, BLOG_MIN_WORDS, KNOWN_DATASETS, isGameRetired, RETRY_PRESETS } from './lib/constants';
 
 // ---------------------------------------------------------------------------
 // Types (self-contained – no @/ imports so tsx can run standalone)
@@ -22,7 +22,7 @@ import { CLAUDE_MODEL, SEASONAL_OVERRIDES, SPECIAL_TOPICS, TARGET_KEYWORDS } fro
 interface DrawResult {
   date: string;
   numbers: number[];
-  bonusNumber: number;
+  bonusNumber: number | null;
   multiplier?: number;
   drawTime?: 'midday' | 'evening';
 }
@@ -130,7 +130,7 @@ function getTopPairs(draws: DrawResult[], count: number): { pair: string; count:
 }
 
 // ---------------------------------------------------------------------------
-// Game configs (standalone, no imports)
+// Game configs — blog-specific fields + metadata derived from KNOWN_DATASETS
 // ---------------------------------------------------------------------------
 
 const GAMES = [
@@ -181,6 +181,14 @@ const TOPICS = [
   'Lump sum vs annuity: what the numbers actually show for current jackpots',
 ] as const;
 
+// Validate that TOPICS and TARGET_KEYWORDS stay in sync
+if (TOPICS.length !== TARGET_KEYWORDS.length) {
+  throw new Error(
+    `TOPICS (${TOPICS.length}) and TARGET_KEYWORDS (${TARGET_KEYWORDS.length}) must have the same length. ` +
+    `Update scripts/lib/constants.ts to keep them in sync.`
+  );
+}
+
 function getTopicForToday(): string {
   const now = new Date();
   const month = now.getMonth() + 1; // 1-12
@@ -196,17 +204,20 @@ function getTopicForToday(): string {
     return SEASONAL_OVERRIDES[month];
   }
 
-  // Fall back to standard rotation
+  // Fall back to standard rotation (day 1 = Jan 1)
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
   const dayOfYear = Math.floor(
-    (Date.now() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000
-  );
+    (now.getTime() - startOfYear.getTime()) / 86400000
+  ) + 1;
   return TOPICS[dayOfYear % TOPICS.length];
 }
 
 function getTargetKeywordForToday(): string {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
   const dayOfYear = Math.floor(
-    (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
-  );
+    (now.getTime() - startOfYear.getTime()) / 86400000
+  ) + 1;
   return TARGET_KEYWORDS[dayOfYear % TARGET_KEYWORDS.length];
 }
 
@@ -262,8 +273,16 @@ async function main() {
     }
   }
 
-  // Build analysis sections for all games
-  const gameSections = GAMES
+  // Build analysis sections for all active games (skip retired games)
+  const activeGames = GAMES.filter(g => {
+    if (isGameRetired(g.slug)) {
+      console.log(`Skipping ${g.name} (retired ${KNOWN_DATASETS[g.slug]?.retiredDate})`);
+      return false;
+    }
+    return true;
+  });
+
+  const gameSections = activeGames
     .map(g => buildGameAnalysis(g.slug, g.name, g.maxMain, g.hasBonus, g.bonusLabel))
     .filter(Boolean)
     .join('\n\n');
@@ -326,10 +345,15 @@ Respond with ONLY valid JSON (no markdown fences, no explanation) in this exact 
       max_tokens: 2048,
       messages: [{ role: 'user', content: prompt }],
     }),
-    { maxAttempts: 2, baseDelayMs: 3000, label: 'Claude blog generation' }
+    { ...RETRY_PRESETS.CLAUDE_API, label: 'Claude blog generation' }
   );
 
-  const text = message.content[0].type === 'text' ? message.content[0].text : '';
+  const textBlock = message.content.find(b => b.type === 'text');
+  if (!textBlock || textBlock.type !== 'text') {
+    console.error('Claude response contains no text block');
+    process.exit(1);
+  }
+  const text = textBlock.text;
 
   let post: BlogPost;
   try {
@@ -345,12 +369,45 @@ Respond with ONLY valid JSON (no markdown fences, no explanation) in this exact 
     }
   }
 
+  // Validate required fields
+  const requiredFields = ['slug', 'title', 'description', 'category', 'content'] as const;
+  for (const field of requiredFields) {
+    if (!post[field] || typeof post[field] !== 'string' || post[field].trim() === '') {
+      console.error(`Blog post missing or empty required field: ${field}`);
+      process.exit(1);
+    }
+  }
+
+  // Content quality validation
+  const wordCount = post.content.split(/\s+/).filter(Boolean).length;
+  if (wordCount < BLOG_MIN_WORDS) {
+    console.error(`Blog post too short: ${wordCount} words (minimum: ${BLOG_MIN_WORDS})`);
+    process.exit(1);
+  }
+
+  const contentLower = post.content.toLowerCase();
+  for (const term of BLOG_FORBIDDEN_TERMS) {
+    if (contentLower.includes(term)) {
+      console.error(`Blog post contains forbidden term: "${term}" — rewrite needed`);
+      process.exit(1);
+    }
+  }
+
   // Enforce today's date
   post.date = today;
 
   // Ensure slug contains date for uniqueness
-  if (!post.slug.includes(today)) {
+  if (!post.slug.endsWith(today) && !post.slug.includes(`-${today}`)) {
     post.slug = `${post.slug}-${today}`;
+  }
+
+  // Check for slug collisions against existing posts
+  const existingSlugs = fs.readdirSync(outputDir)
+    .filter(f => f.endsWith('.json'))
+    .map(f => f.replace('.json', ''));
+  if (existingSlugs.includes(post.slug)) {
+    console.log(`Slug collision detected: ${post.slug} — appending timestamp`);
+    post.slug = `${post.slug}-${Date.now()}`;
   }
 
   const outputPath = path.join(outputDir, `${post.slug}.json`);

@@ -3,7 +3,7 @@ import { getLottery, getAllLotterySlugs } from '@/lib/lotteries/config';
 import { loadLotteryData } from '@/lib/data/fetcher';
 import { generateLotteryMetadata } from '@/lib/seo/metadata';
 import { breadcrumbSchema } from '@/lib/seo/structuredData';
-import { SITE_URL } from '@/lib/utils/constants';
+import { SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
 import { getYearsRange } from '@/lib/utils/formatters';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import ResultsTable from '@/components/lottery/ResultsTable';
@@ -77,6 +77,8 @@ export default async function YearResultsPage({ params }: { params: Promise<{ lo
         <Card padding={false}>
           <ResultsTable draws={yearDraws} config={lottery} />
         </Card>
+
+        <p className="mt-8 text-center text-sm text-gray-500">{DISCLAIMER_TEXT}</p>
       </div>
     </>
   );

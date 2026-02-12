@@ -11,13 +11,12 @@
 
 import fs from 'fs';
 import path from 'path';
+import { MIN_PAGES, LOTTERY_DATA_FILES, DATA_STALENESS_DAYS } from './lib/constants';
 
 const ROOT = process.cwd();
 const BUILD_DIR = path.join(ROOT, '.next', 'server', 'app');
 const BLOG_DIR = path.join(ROOT, 'content', 'blog');
 const DATA_DIR = path.join(ROOT, 'src', 'data');
-
-const MIN_PAGES = 550;
 
 let warnings = 0;
 let errors = 0;
@@ -118,9 +117,7 @@ if (fs.existsSync(BLOG_DIR)) {
 
 console.log('\n=== Data freshness check ===');
 
-const dataFiles = ['powerball.json', 'mega-millions.json', 'cash4life.json', 'ny-lotto.json', 'take5.json'];
-
-for (const file of dataFiles) {
+for (const file of LOTTERY_DATA_FILES) {
   const filePath = path.join(DATA_DIR, file);
   if (!fs.existsSync(filePath)) {
     fail(`${file}: data file missing`);
@@ -135,7 +132,7 @@ for (const file of dataFiles) {
       const updated = new Date(data.lastUpdated);
       const age = Date.now() - updated.getTime();
       const days = Math.floor(age / (1000 * 60 * 60 * 24));
-      if (days > 7) {
+      if (days > DATA_STALENESS_DAYS) {
         warn(`${file}: data is ${days} days old`);
       } else {
         pass(`${file}: updated ${days} day(s) ago`);

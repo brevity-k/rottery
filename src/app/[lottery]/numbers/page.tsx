@@ -140,15 +140,20 @@ export default async function NumbersPage({ params }: { params: Promise<{ lotter
             <>
               <h3 className="text-sm font-semibold text-gray-700 mb-3">{lottery.bonusNumber.label} (1-{lottery.bonusNumber.max})</h3>
               <div className="flex flex-wrap gap-1.5">
-                {Array.from({ length: lottery.bonusNumber.max }, (_, i) => i + 1).map(n => (
-                  <Link
-                    key={n}
-                    href={`/${slug}/numbers/bonus-${n}`}
-                    className="w-9 h-9 rounded-full bg-red-500 text-white inline-flex items-center justify-center text-xs font-bold hover:bg-red-600 transition-colors"
-                  >
-                    {n}
-                  </Link>
-                ))}
+                {Array.from({ length: lottery.bonusNumber.max }, (_, i) => i + 1).map(n => {
+                  const bonusColor = lottery.colors.bonusBall;
+                  const textColor = ['#ffd700', '#ffff00', '#fbbf24'].includes(bonusColor.toLowerCase()) ? '#1f2937' : '#ffffff';
+                  return (
+                    <Link
+                      key={n}
+                      href={`/${slug}/numbers/bonus-${n}`}
+                      className="w-9 h-9 rounded-full inline-flex items-center justify-center text-xs font-bold opacity-90 hover:opacity-100 transition-opacity"
+                      style={{ backgroundColor: bonusColor, color: textColor }}
+                    >
+                      {n}
+                    </Link>
+                  );
+                })}
               </div>
             </>
           )}

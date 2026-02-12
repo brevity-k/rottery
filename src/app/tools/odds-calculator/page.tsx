@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { getAllLotteries } from '@/lib/lotteries/config';
 import { softwareAppSchema, breadcrumbSchema, faqSchema } from '@/lib/seo/structuredData';
 import { getOddsCalculatorFaqs } from '@/lib/seo/faqContent';
-import { SITE_NAME, SITE_URL } from '@/lib/utils/constants';
+import { SITE_NAME, SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
 import JsonLd from '@/components/seo/JsonLd';
 import FAQSection from '@/components/seo/FAQSection';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
@@ -11,6 +11,12 @@ import Card from '@/components/ui/Card';
 export const metadata: Metadata = {
   title: `Lottery Odds Calculator | ${SITE_NAME}`,
   description: 'Understand your lottery odds. Compare jackpot probabilities for Powerball, Mega Millions, and other US lotteries.',
+  openGraph: {
+    title: `Lottery Odds Calculator | ${SITE_NAME}`,
+    description: 'Understand your lottery odds. Compare jackpot probabilities for Powerball, Mega Millions, and other US lotteries.',
+    url: `${SITE_URL}/tools/odds-calculator`,
+  },
+  alternates: { canonical: `${SITE_URL}/tools/odds-calculator` },
 };
 
 function factorial(n: number): number {
@@ -38,7 +44,6 @@ export default function OddsCalculatorPage() {
       })} />
       <JsonLd data={breadcrumbSchema([
         { name: 'Home', url: SITE_URL },
-        { name: 'Tools', url: `${SITE_URL}/tools/number-generator` },
         { name: 'Odds Calculator', url: `${SITE_URL}/tools/odds-calculator` },
       ])} />
 
@@ -98,6 +103,10 @@ export default function OddsCalculatorPage() {
         })}
 
         <FAQSection faqs={faqs} />
+
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center mt-8">
+          <p className="text-sm text-amber-800">{DISCLAIMER_TEXT}</p>
+        </div>
       </div>
     </>
   );

@@ -50,7 +50,7 @@ function parseEntry(entry: Record<string, string>, config: LotteryConfig): DrawR
         results.push({
           date,
           numbers: middayNums.slice(0, mainCount),
-          bonusNumber: 0,
+          bonusNumber: null,
           drawTime: 'midday',
         });
       }
@@ -63,7 +63,7 @@ function parseEntry(entry: Record<string, string>, config: LotteryConfig): DrawR
         results.push({
           date,
           numbers: eveningNums.slice(0, mainCount),
-          bonusNumber: 0,
+          bonusNumber: null,
           drawTime: 'evening',
         });
       }
@@ -80,13 +80,13 @@ function parseEntry(entry: Record<string, string>, config: LotteryConfig): DrawR
   if (allNumbers.some(isNaN)) return null;
 
   let numbers: number[];
-  let bonusNumber: number;
+  let bonusNumber: number | null;
 
   if (!hasBonus) {
     // No bonus number (e.g., Take 5 with single draw field)
     if (allNumbers.length < mainCount) return null;
     numbers = allNumbers.slice(0, mainCount);
-    bonusNumber = 0;
+    bonusNumber = null;
   } else if (bonusField && bonusField !== 'winning_numbers' && entry[bonusField] !== undefined) {
     // Bonus in separate field (Mega Millions, Cash4Life, NY Lotto)
     if (allNumbers.length < mainCount) return null;

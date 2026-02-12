@@ -13,11 +13,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { withRetry } from './lib/retry';
+import { KNOWN_DATASETS, isGameRetired, RETRY_PRESETS } from './lib/constants';
 
-interface LotterySource {
-  id: string;
-  name: string;
-  url: string;
+interface LotterySourceValidation {
   mainCount: number;
   mainMax: number;
   bonusMax: number;
@@ -25,25 +23,26 @@ interface LotterySource {
   middayField?: string;
   eveningField?: string;
   expectedDrawDays?: number[];  // 0=Sun, 1=Mon, ... 6=Sat
-  retiredDate?: string;         // ISO date string — skip stale check if retired
   staleDays: number;            // Max days before latest draw is considered stale
 }
 
-const sources: LotterySource[] = [
-  {
-    id: 'powerball',
-    name: 'Powerball',
-    url: 'https://data.ny.gov/resource/d6yy-54nr.json',
+interface LotterySource extends LotterySourceValidation {
+  id: string;
+  name: string;
+  url: string;
+  retiredDate?: string;
+}
+
+/** Validation-specific fields per game (not duplicated from constants). */
+const VALIDATION_CONFIG: Record<string, LotterySourceValidation> = {
+  powerball: {
     mainCount: 5,
     mainMax: 69,
     bonusMax: 26,
     expectedDrawDays: [1, 3, 6],  // Mon, Wed, Sat
     staleDays: 4,
   },
-  {
-    id: 'mega-millions',
-    name: 'Mega Millions',
-    url: 'https://data.ny.gov/resource/5xaw-6ayf.json',
+  'mega-millions': {
     mainCount: 5,
     mainMax: 70,
     // Historical data has bonus up to 25 (pre-April 2025); current format is 1-24.
@@ -53,22 +52,15 @@ const sources: LotterySource[] = [
     expectedDrawDays: [2, 5],  // Tue, Fri
     staleDays: 4,
   },
-  {
-    id: 'cash4life',
-    name: 'Cash4Life',
-    url: 'https://data.ny.gov/resource/kwxv-fwze.json',
+  cash4life: {
     mainCount: 5,
     mainMax: 60,
     bonusMax: 4,
     bonusField: 'cash_ball',
     expectedDrawDays: [0, 1, 2, 3, 4, 5, 6],  // Daily
-    retiredDate: '2026-02-21',
     staleDays: 3,
   },
-  {
-    id: 'ny-lotto',
-    name: 'NY Lotto',
-    url: 'https://data.ny.gov/resource/6nbc-h7bj.json',
+  'ny-lotto': {
     mainCount: 6,
     mainMax: 59,
     bonusMax: 59,
@@ -76,10 +68,7 @@ const sources: LotterySource[] = [
     expectedDrawDays: [3, 6],  // Wed, Sat
     staleDays: 5,
   },
-  {
-    id: 'take5',
-    name: 'Take 5',
-    url: 'https://data.ny.gov/resource/dg63-4siq.json',
+  take5: {
     mainCount: 5,
     mainMax: 39,
     bonusMax: 0,
@@ -88,12 +77,27 @@ const sources: LotterySource[] = [
     expectedDrawDays: [0, 1, 2, 3, 4, 5, 6],  // Daily
     staleDays: 3,
   },
-];
+};
+
+/** Derive sources from centralized KNOWN_DATASETS + validation-specific fields. */
+const sources: LotterySource[] = Object.entries(KNOWN_DATASETS).map(([key, dataset]) => {
+  const validation = VALIDATION_CONFIG[key];
+  if (!validation) {
+    throw new Error(`Missing validation config for game: ${key}. Update VALIDATION_CONFIG in update-data.ts.`);
+  }
+  return {
+    id: dataset.slug,
+    name: dataset.name,
+    url: `https://data.ny.gov/resource/${dataset.datasetId}.json`,
+    retiredDate: dataset.retiredDate,
+    ...validation,
+  };
+});
 
 interface DrawResult {
   date: string;
   numbers: number[];
-  bonusNumber: number;
+  bonusNumber: number | null;
   multiplier?: number;
   drawTime?: 'midday' | 'evening';
 }
@@ -112,6 +116,14 @@ interface ValidationWarning {
 function validateDraw(draw: DrawResult, source: LotterySource): ValidationWarning[] {
   const warnings: ValidationWarning[] = [];
 
+  // Number count validation
+  if (draw.numbers.length !== source.mainCount) {
+    warnings.push({
+      type: 'count',
+      message: `${source.name}: Expected ${source.mainCount} main numbers, got ${draw.numbers.length} on ${draw.date}`,
+    });
+  }
+
   // Range validation for main numbers
   for (const num of draw.numbers) {
     if (num < 1 || num > source.mainMax) {
@@ -123,7 +135,7 @@ function validateDraw(draw: DrawResult, source: LotterySource): ValidationWarnin
   }
 
   // Range validation for bonus number
-  if (source.bonusMax > 0 && draw.bonusNumber > 0) {
+  if (source.bonusMax > 0 && draw.bonusNumber !== null) {
     if (draw.bonusNumber < 1 || draw.bonusNumber > source.bonusMax) {
       warnings.push({
         type: 'range',
@@ -174,7 +186,7 @@ async function fetchData(source: LotterySource): Promise<{ draws: DrawResult[]; 
       if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`);
       return r;
     }),
-    { maxAttempts: 3, baseDelayMs: 2000, label: `fetch ${source.name}` }
+    { ...RETRY_PRESETS.SODA_DATA, label: `fetch ${source.name}` }
   );
 
   const rawData: Record<string, string>[] = await response.json();
@@ -197,7 +209,7 @@ async function fetchData(source: LotterySource): Promise<{ draws: DrawResult[]; 
             const draw: DrawResult = {
               date,
               numbers: nums.slice(0, source.mainCount),
-              bonusNumber: 0,
+              bonusNumber: null,
               drawTime: 'midday',
             };
             allWarnings.push(...validateDraw(draw, source));
@@ -212,7 +224,7 @@ async function fetchData(source: LotterySource): Promise<{ draws: DrawResult[]; 
             const draw: DrawResult = {
               date,
               numbers: nums.slice(0, source.mainCount),
-              bonusNumber: 0,
+              bonusNumber: null,
               drawTime: 'evening',
             };
             allWarnings.push(...validateDraw(draw, source));
@@ -228,7 +240,7 @@ async function fetchData(source: LotterySource): Promise<{ draws: DrawResult[]; 
       if (allNumbers.some(isNaN)) continue;
 
       let mainNumbers: number[];
-      let bonusNumber: number;
+      let bonusNumber: number | null;
 
       if (source.bonusField && record[source.bonusField]) {
         if (allNumbers.length < source.mainCount) continue;
@@ -238,7 +250,7 @@ async function fetchData(source: LotterySource): Promise<{ draws: DrawResult[]; 
       } else if (source.bonusMax === 0) {
         if (allNumbers.length < source.mainCount) continue;
         mainNumbers = allNumbers.slice(0, source.mainCount);
-        bonusNumber = 0;
+        bonusNumber = null;
       } else {
         if (allNumbers.length < source.mainCount + 1) continue;
         mainNumbers = allNumbers.slice(0, source.mainCount);
@@ -277,7 +289,7 @@ function checkStaleData(
 
   for (const source of sources) {
     // Skip retired games
-    if (source.retiredDate && new Date(source.retiredDate) < now) {
+    if (isGameRetired(source.id, now)) {
       continue;
     }
 
@@ -395,4 +407,7 @@ async function main() {
   }
 }
 
-main().catch(console.error);
+main().catch((err) => {
+  console.error('update-data failed:', err);
+  process.exit(1);
+});

@@ -48,7 +48,7 @@ export default function ResultsTable({ draws, config, limit }: ResultsTableProps
               </td>
               {hasBonus && (
                 <td className="py-3 px-4">
-                  <LotteryBall number={draw.bonusNumber} type="bonus" size="sm" />
+                  <LotteryBall number={draw.bonusNumber!} type="bonus" size="sm" color={config.colors.bonusBall} />
                 </td>
               )}
               {hasMultiplier && (

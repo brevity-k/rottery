@@ -53,7 +53,7 @@ export default function NumberGenerator({ config }: NumberGeneratorProps) {
             {numbers.map((num, i) => (
               <LotteryBall key={i} number={num} type="main" size="lg" />
             ))}
-            {hasBonus && <LotteryBall number={bonusNumber} type="bonus" size="lg" />}
+            {hasBonus && <LotteryBall number={bonusNumber} type="bonus" size="lg" color={config.colors.bonusBall} />}
           </>
         ) : (
           <p className="text-gray-400 text-lg">Click generate to get your numbers</p>

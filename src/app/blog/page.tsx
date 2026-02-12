@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_NAME, SITE_URL } from '@/lib/utils/constants';
+import { calculateReadingTime } from '@/lib/utils/formatters';
 import { breadcrumbSchema } from '@/lib/seo/structuredData';
 import { getAllBlogPosts } from '@/lib/blog';
 import JsonLd from '@/components/seo/JsonLd';
@@ -9,6 +10,12 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs';
 export const metadata: Metadata = {
   title: `Lottery Blog - Tips, Statistics & Guides`,
   description: `Read expert lottery articles covering Powerball, Mega Millions, statistics, and more. Data-driven insights from ${SITE_NAME}.`,
+  openGraph: {
+    title: 'Lottery Blog - Tips, Statistics & Guides',
+    description: `Read expert lottery articles covering Powerball, Mega Millions, statistics, and more. Data-driven insights from ${SITE_NAME}.`,
+    url: `${SITE_URL}/blog`,
+  },
+  alternates: { canonical: `${SITE_URL}/blog` },
 };
 
 function formatDate(dateStr: string): string {
@@ -67,7 +74,7 @@ export default function BlogPage() {
               </h2>
               <p className="text-gray-600 text-base sm:text-lg leading-relaxed mb-4">{featured.description}</p>
               <div className="flex items-center justify-between">
-                <time className="text-sm text-gray-400" dateTime={featured.date}>{formatDate(featured.date)}</time>
+                <time className="text-sm text-gray-400" dateTime={featured.date}>{formatDate(featured.date)} · {calculateReadingTime(featured.content)}</time>
                 <span className="text-sm font-medium text-blue-600 group-hover:underline">Read article &rarr;</span>
               </div>
             </article>
@@ -88,7 +95,7 @@ export default function BlogPage() {
                   {post.title}
                 </h2>
                 <p className="text-sm text-gray-500 leading-relaxed mb-4 flex-1 line-clamp-3">{post.description}</p>
-                <time className="text-xs text-gray-400" dateTime={post.date}>{formatDate(post.date)}</time>
+                <time className="text-xs text-gray-400" dateTime={post.date}>{formatDate(post.date)} · {calculateReadingTime(post.content)}</time>
               </article>
             </Link>
           ))}

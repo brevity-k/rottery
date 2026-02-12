@@ -40,12 +40,13 @@ export interface LotteryConfig {
   logo?: string;
   website: string;
   startYear: number;
+  retiredDate?: string; // ISO date (YYYY-MM-DD) when the game was retired, e.g., '2026-02-21' for Cash4Life
 }
 
 export interface DrawResult {
   date: string;
   numbers: number[];
-  bonusNumber: number;
+  bonusNumber: number | null;
   multiplier?: number;
   jackpot?: string;
   drawTime?: 'midday' | 'evening';
@@ -103,7 +104,7 @@ export interface GapAnalysis {
 
 export interface RecommendedSet {
   numbers: number[];
-  bonusNumber: number;
+  bonusNumber: number | null;
   strategy: string;
   reasoning: string[];
   confidence: number;

@@ -48,6 +48,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (name.length > 200 || email.length > 320 || message.length > 5000) {
+      return NextResponse.json(
+        { error: 'Input exceeds maximum allowed length.' },
+        { status: 400 }
+      );
+    }
+
     // Send notification to site owner
     await resend.emails.send({
       from: FROM_EMAIL,

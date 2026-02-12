@@ -8,11 +8,7 @@ export function websiteSchema() {
     name: SITE_NAME,
     url: SITE_URL,
     description: 'AI-Powered Lottery Number Insights & Statistics',
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${SITE_URL}/search?q={search_term_string}`,
-      'query-input': 'required name=search_term_string',
-    },
+    inLanguage: 'en-US',
   };
 }
 
@@ -67,6 +63,35 @@ export function articleSchema(article: {
       name: SITE_NAME,
       url: SITE_URL,
     },
+  };
+}
+
+export function datasetSchema(dataset: {
+  name: string;
+  description: string;
+  url: string;
+  recordCount: number;
+  dateRange: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: dataset.name,
+    description: dataset.description,
+    url: dataset.url,
+    license: 'https://creativecommons.org/publicdomain/zero/1.0/',
+    creator: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    distribution: {
+      '@type': 'DataDownload',
+      encodingFormat: 'text/html',
+      contentUrl: dataset.url,
+    },
+    temporalCoverage: dataset.dateRange,
+    variableMeasured: `${dataset.recordCount} lottery draw results`,
   };
 }
 

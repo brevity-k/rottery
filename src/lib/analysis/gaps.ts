@@ -12,7 +12,7 @@ export function calculateGaps(
     const appearances: number[] = [];
 
     for (let i = 0; i < draws.length; i++) {
-      const nums = type === 'main' ? draws[i].numbers : [draws[i].bonusNumber];
+      const nums = type === 'main' ? draws[i].numbers : (draws[i].bonusNumber !== null ? [draws[i].bonusNumber] : []);
       if (nums.includes(num)) {
         appearances.push(i);
       }

@@ -8,14 +8,13 @@ export function calculateFrequency(
   const counts = new Map<number, { count: number; lastDrawn: string }>();
 
   // Initialize all numbers
-  const max = type === 'main' ? maxNumber : maxNumber;
-  for (let i = 1; i <= max; i++) {
+  for (let i = 1; i <= maxNumber; i++) {
     counts.set(i, { count: 0, lastDrawn: '' });
   }
 
   // Count occurrences
   for (const draw of draws) {
-    const numbersToCheck = type === 'main' ? draw.numbers : [draw.bonusNumber];
+    const numbersToCheck = type === 'main' ? draw.numbers : (draw.bonusNumber !== null ? [draw.bonusNumber] : []);
     for (const num of numbersToCheck) {
       const existing = counts.get(num);
       if (existing) {
@@ -32,7 +31,7 @@ export function calculateFrequency(
   return Array.from(counts.entries()).map(([number, data]) => {
     const drawsSinceLastDrawn = data.lastDrawn
       ? draws.findIndex(d => {
-          const nums = type === 'main' ? d.numbers : [d.bonusNumber];
+          const nums = type === 'main' ? d.numbers : (d.bonusNumber !== null ? [d.bonusNumber] : []);
           return nums.includes(number);
         })
       : totalDraws;

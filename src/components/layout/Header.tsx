@@ -37,19 +37,20 @@ export default function Header() {
 function LotteriesDropdown({ lotteries }: { lotteries: ReturnType<typeof getAllLotteries> }) {
   return (
     <div className="relative group">
-      <button className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors flex items-center gap-1">
+      <button aria-haspopup="true" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors flex items-center gap-1">
         Lotteries
-        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
       <div className="absolute left-0 top-full pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2" role="menu">
           {lotteries.map(lottery => (
             <Link
               key={lottery.slug}
               href={`/${lottery.slug}`}
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              role="menuitem"
             >
               {lottery.name}
             </Link>
@@ -63,24 +64,24 @@ function LotteriesDropdown({ lotteries }: { lotteries: ReturnType<typeof getAllL
 function ToolsDropdown() {
   return (
     <div className="relative group">
-      <button className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors flex items-center gap-1">
+      <button aria-haspopup="true" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors flex items-center gap-1">
         Tools
-        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
       <div className="absolute left-0 top-full pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2">
-          <Link href="/tools/tax-calculator" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2" role="menu">
+          <Link href="/tools/tax-calculator" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" role="menuitem">
             Tax Calculator
           </Link>
-          <Link href="/tools/number-generator" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+          <Link href="/tools/number-generator" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" role="menuitem">
             Number Generator
           </Link>
-          <Link href="/tools/odds-calculator" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+          <Link href="/tools/odds-calculator" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" role="menuitem">
             Odds Calculator
           </Link>
-          <Link href="/tools/ticket-checker" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+          <Link href="/tools/ticket-checker" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" role="menuitem">
             Ticket Checker
           </Link>
         </div>
@@ -93,8 +94,8 @@ function MobileMenu({ lotteries }: { lotteries: ReturnType<typeof getAllLotterie
   return (
     <div className="md:hidden">
       <details className="relative">
-        <summary className="list-none cursor-pointer p-2">
-          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <summary className="list-none cursor-pointer p-2" aria-label="Open navigation menu">
+          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </summary>

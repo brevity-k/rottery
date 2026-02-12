@@ -17,8 +17,6 @@ export const metadata: Metadata = {
     title: `Lottery Ticket Checker | ${SITE_NAME}`,
     description: 'Check your lottery numbers against past draws. Instantly see how many numbers you matched.',
     url: `${SITE_URL}/tools/ticket-checker`,
-    siteName: SITE_NAME,
-    type: 'website',
   },
   alternates: {
     canonical: `${SITE_URL}/tools/ticket-checker`,
@@ -60,7 +58,6 @@ export default function TicketCheckerPage() {
       })} />
       <JsonLd data={breadcrumbSchema([
         { name: 'Home', url: SITE_URL },
-        { name: 'Tools', url: `${SITE_URL}/tools/ticket-checker` },
         { name: 'Ticket Checker', url: `${SITE_URL}/tools/ticket-checker` },
       ])} />
 

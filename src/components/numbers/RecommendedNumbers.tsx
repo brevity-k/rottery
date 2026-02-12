@@ -28,7 +28,7 @@ export default function RecommendedNumbers({ sets, config }: RecommendedNumbersP
             {hasBonus && (
               <>
                 <span className="text-gray-300 mx-1">+</span>
-                <LotteryBall number={set.bonusNumber} type="bonus" size="md" />
+                <LotteryBall number={set.bonusNumber!} type="bonus" size="md" color={config.colors.bonusBall} />
               </>
             )}
           </div>

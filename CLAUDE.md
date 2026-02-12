@@ -79,7 +79,7 @@ rottery/
 │   │   │   ├── results/[year]/      # Results by year (2001-2026)
 │   │   │   └── statistics/page.tsx  # Frequency charts, hot/cold, overdue, pairs
 │   │   ├── states/                  # State lottery hubs
-│   │   │   ├── page.tsx             # States index (10 states)
+│   │   │   ├── page.tsx             # States index (46 states)
 │   │   │   └── [state]/page.tsx     # Individual state hub (tax, games, claims, FAQ)
 │   │   ├── api/contact/route.ts     # Serverless: Resend email API
 │   │   ├── contact/page.tsx         # Contact form page
@@ -105,7 +105,7 @@ rottery/
 │   │   └── ui/        Button, Card, Tabs
 │   ├── lib/
 │   │   ├── lotteries/ config.ts (5 lottery definitions), types.ts (supports optional bonus, drawsPerDay, drawTime)
-│   │   ├── states/    config.ts (10 state configs with tax, games, claims, facts)
+│   │   ├── states/    config.ts (46 state configs with tax, games, claims, facts)
 │   │   ├── data/      fetcher.ts (SODA API + JSON loader), parser.ts (handles all game formats)
 │   │   ├── analysis/  frequency, hotCold, overdue, gaps, pairs, triplets, quadruplets, recommendations (handles no-bonus)
 │   │   ├── seo/       metadata.ts, structuredData.ts (JSON-LD schemas, game-specific FAQs), faqContent.ts (FAQ generators for all pages)
@@ -121,11 +121,18 @@ rottery/
 ├── scripts/
 │   ├── lib/
 │   │   ├── retry.ts                 # Shared retry utility with exponential backoff
-│   │   └── constants.ts             # Shared constants (CLAUDE_MODEL, etc.)
+│   │   └── constants.ts             # Shared constants (CLAUDE_MODEL, build thresholds, seasonal/special topics, SEO keywords)
 │   ├── update-data.ts               # SODA API fetcher for all 5 games + validation + stale detection
-│   ├── generate-blog-post.ts        # Claude-powered daily blog (14-topic rotation, 5 games)
-│   ├── check-new-datasets.ts        # Auto-detect new SODA lottery datasets (weekly)
-│   └── update-tax-rates.ts          # Auto-update state tax rates via Claude API (quarterly)
+│   ├── generate-blog-post.ts        # Claude-powered daily blog (14-topic rotation, 5 games, retirement-aware)
+│   ├── check-new-datasets.ts        # Auto-detect new SODA lottery datasets (weekly, with retry)
+│   ├── update-tax-rates.ts          # Auto-update state tax rates via Claude API (quarterly)
+│   ├── validate-build.ts            # Post-build validation (draw counts, page count, blog integrity)
+│   ├── seo-health-check.ts          # Weekly SEO check (page count, data freshness, blog quality)
+│   ├── cleanup-stale-issues.ts      # Auto-close resolved automation-failure GitHub Issues
+│   ├── onboard-new-game.ts          # Semi-automated new lottery game onboarding via Claude API
+│   ├── generate-state-configs.ts    # Generate/update state hub configs via Claude API (quarterly)
+│   ├── generate-methodology.ts      # One-time methodology page content generation
+│   └── sync-claude-md.ts            # Sync CLAUDE.md stats (page count, draw counts) after builds
 ├── .github/workflows/
 │   ├── update-lottery-data.yml      # Daily cron at 6 AM UTC (data + blog)
 │   └── weekly-maintenance.yml       # Weekly: new datasets check, quarterly: tax rate update
@@ -142,14 +149,29 @@ rottery/
 ```bash
 # Development
 npm run dev                    # Start dev server (http://localhost:3000)
-npm run build                  # Build for production (~173 pages)
+npm run build                  # Build for production (~617 pages)
 npm run start                  # Serve production build
 
-# Data updates
-npx tsx scripts/update-data.ts              # Fetch all 5 games from SODA API
+# Data updates (daily automation)
+npx tsx scripts/update-data.ts              # Fetch all 5 games from SODA API + validate
 npx tsx scripts/generate-blog-post.ts       # Generate daily blog post (needs ANTHROPIC_API_KEY)
+
+# Monitoring (weekly automation)
 npx tsx scripts/check-new-datasets.ts       # Check for new SODA lottery datasets
+npx tsx scripts/cleanup-stale-issues.ts     # Auto-close resolved GitHub Issues
+
+# Quarterly automation
 npx tsx scripts/update-tax-rates.ts         # Update state tax rates via Claude (needs ANTHROPIC_API_KEY)
+npx tsx scripts/generate-state-configs.ts   # Refresh state hub configs via Claude (needs ANTHROPIC_API_KEY)
+
+# Build validation
+npx tsx scripts/validate-build.ts           # Post-build checks (draw counts, page count, blog integrity)
+npx tsx scripts/seo-health-check.ts         # SEO audit (page count, data freshness, blog quality)
+
+# One-time / semi-automated
+npx tsx scripts/onboard-new-game.ts <id>    # Onboard new lottery game from SODA dataset ID
+npx tsx scripts/generate-methodology.ts     # Generate methodology page content
+npx tsx scripts/sync-claude-md.ts           # Sync CLAUDE.md stats after build
 
 # Lint
 npm run lint                   # ESLint check
@@ -176,24 +198,33 @@ The site is designed to run itself with minimal manual intervention.
 1. Fetch all 5 lottery datasets from SODA API (with retry: 3 attempts, exponential backoff)
 2. Validate data: range checks, schedule validation, duplicate detection, record count guard
 3. Check for stale data: per-game staleness thresholds (PB/MM: 4 days, C4L/T5: 3 days, NYL: 5 days)
-4. Generate blog post via Claude Haiku (14-topic rotation covering all 5 games + tax/state topics, with retry)
-5. Build verification before commit
-6. Auto-commit + push → Vercel auto-deploys
-7. On failure: auto-creates GitHub Issue with `automation-failure` label (deduplicates with existing issues)
-8. On stale data: writes `.stale-warning` marker → workflow creates GitHub Issue
+4. Generate blog post via Claude Haiku (14-topic rotation covering active games + tax/state topics, with retry)
+   - Retired games (e.g., Cash4Life after 2026-02-21) are automatically excluded from analysis
+   - TOPICS and TARGET_KEYWORDS arrays validated at startup for length parity
+5. Build verification before commit (`npm run build && validate-build.ts`)
+6. Sync CLAUDE.md stats (page count, draw counts)
+7. Auto-commit + push → Vercel auto-deploys
+8. On blog failure: data still commits, but workflow reports failure + creates GitHub Issue
+9. On stale data: writes `.stale-warning` marker → workflow creates GitHub Issue
 
 ### Weekly Automation (Monday 8 AM UTC)
 - Scan `data.ny.gov` SODA catalog for new lottery-related datasets (12 search terms, with retry)
 - Compare against known dataset IDs (5 games)
 - Auto-create GitHub Issue if new datasets found (e.g., Millionaire for Life)
+- Auto-close resolved automation-failure Issues (`cleanup-stale-issues.ts`)
+- Dependency security audit (`npm audit --audit-level=high`)
+- SEO health check (page count, data freshness, blog quality)
 - On failure: auto-creates GitHub Issue with `automation-failure` label
 
-### Quarterly Automation (Jan, Apr, Jul, Oct)
+### Quarterly Automation (Jan, Apr, Jul, Oct — first 7 days)
 - Use Claude API to verify/update state tax rates against current data (with retry)
 - Sanity bounds: reject rates > 15% or changes > 3 percentage points (catches hallucinations)
 - Line-based file editing (safer than regex)
+- Refresh state hub configs via Claude API (`generate-state-configs.ts`)
+- Build verification before commit (`npm run build && validate-build.ts`)
 - Auto-commit changes if rates have changed
 - On failure: auto-creates GitHub Issue with `automation-failure` label
+- Also runs on `workflow_dispatch` (manual trigger) regardless of date
 
 ### Data Validation (in `update-data.ts`)
 - **Range validation:** Every number checked against game's max values
@@ -205,22 +236,28 @@ The site is designed to run itself with minimal manual intervention.
 - **Anomaly warnings:** Logged to console, included in CI output
 
 ### Retry Logic (in `scripts/lib/retry.ts`)
-All API calls use `withRetry()` with exponential backoff:
+All external API calls use `withRetry()` with exponential backoff:
 - **SODA API fetches:** 3 attempts, 2s base delay
 - **Claude API calls:** 2 attempts, 3s base delay
 - **SODA catalog searches:** 2 attempts, 1s base delay
+- **GitHub API calls:** 2 attempts, 2s base delay (issue search, create, comment, workflow runs)
 
 ### Failure Notifications
 All GitHub Actions workflows create Issues on failure:
 - **Label:** `automation-failure` — used for deduplication (comment on existing open issue instead of creating duplicates)
 - **Stale data:** Separate `[Auto] Stale lottery data detected` issue with warning details
-- **Workflow failures:** `[Auto] update-lottery-data failed`, `[Auto] check-new-datasets failed`, `[Auto] quarterly-tax-update failed`
+- **Blog failures:** `[Auto] blog generation failed` — data still commits, workflow shows failed
+- **Workflow failures:** `[Auto] update-lottery-data failed`, `[Auto] check-new-datasets failed`, `[Auto] quarterly-tax-update failed`, `[Auto] quarterly-state-refresh failed`
+- **SEO failures:** `[Auto] SEO health check failed` (label: `seo-health`)
+- **Security:** `[Auto] npm security vulnerabilities detected`
+- **Auto-close:** `cleanup-stale-issues.ts` closes issues when corresponding workflow succeeds
 
 ### Self-Corrective Behaviors
 - Build verification before any automated commit (broken builds don't get pushed)
 - New game detection auto-creates actionable GitHub Issues
 - Tax rates auto-verified quarterly with sanity bounds (rejects hallucinated rates)
 - Blog topics cycle through 14 variations to prevent repetition
+- Blog generation skips retired games automatically (e.g., Cash4Life after Feb 21, 2026)
 - Stale data detection alerts before data goes too stale
 - Retry logic prevents transient API failures from breaking the pipeline
 - All failure notifications are deduplicated to prevent issue spam
@@ -245,7 +282,7 @@ All GitHub Actions workflows create Issues on failure:
 | Feature | Competitors | My Lotto Stats | Priority |
 |---|---|---|---|
 | Multi-state game results | 240+ games | 5 games | DONE (Phase 2) |
-| State lottery hubs (50 states) | All majors have it | 10 states | DONE (Phase 2, expand Phase 3) |
+| State lottery hubs (50 states) | All majors have it | 46 states | DONE (Phase 2) |
 | Tax/payout calculator | USAMega, LotteryUSA, Powerball.net | All 50 states + DC | DONE (Phase 2) |
 | Ticket/number checker | LotteryUSA, Powerball.net, LotteryValley | All 5 games | DONE (Phase 2) |
 | Per-number analysis pages | Powerball.net, LottoNumbers | ~410 pages, all 5 games | DONE (Phase 2) |
@@ -264,7 +301,7 @@ All GitHub Actions workflows create Issues on failure:
 6. **Full SEO infrastructure** — JSON-LD, sitemap, robots, per-page metadata
 7. **Self-sufficient automation** — daily data, weekly monitoring, quarterly tax updates, all zero-touch
 8. **Tax calculator** — covers all 50 states + DC with local taxes (NYC, Yonkers, Baltimore)
-9. **State hubs** — 10 state pages with game availability, tax info, claim procedures
+9. **State hubs** — 46 state pages with game availability, tax info, claim procedures
 
 ---
 
@@ -319,7 +356,7 @@ This site falls under **YMYL (Your Money Your Life)** — Google applies higher 
 
 - **Experience:** Show real calculations, methodology transparency, interactive tools (tax calculator)
 - **Expertise:** Cite data sources, mathematical rigor, never claim "prediction"
-- **Authoritativeness:** Comprehensive coverage (5 games, 10 states), regular publishing, linkable data visualizations
+- **Authoritativeness:** Comprehensive coverage (5 games, 46 states), regular publishing, linkable data visualizations
 - **Trustworthiness:** Legal pages, disclaimers, "verify with official lottery" language, responsible gambling messaging (helpline in footer)
 
 ---
@@ -396,7 +433,7 @@ Lottery game formats change every 3-8 years. The April 2025 Mega Millions overha
 ### Phase 2 Priority 1: High-Impact Expansion (COMPLETE — 173 pages)
 - [x] **Tax/payout calculator** — all 50 states + DC, lump sum vs annuity, local taxes (NYC/Yonkers/Baltimore)
 - [x] **3 additional games** — Cash4Life, NY Lotto, Take 5 (each with overview, numbers, results, statistics, year archives)
-- [x] **Top 10 state lottery hubs** — CA, TX, FL, NY, PA, OH, IL, MI, GA, NC (tax info, games, claims, FAQ)
+- [x] **Top 10 state lottery hubs** — CA, TX, FL, NY, PA, OH, IL, MI, GA, NC (expanded to 46 states in Phase 2 Priority 2)
 - [x] **No-bonus game support** — Take 5 (bonusNumber.count === 0) handled across all layers
 - [x] **Midday/evening draw support** — Take 5's twice-daily draws with drawTime field
 - [x] **Data validation** — range, schedule, duplicate, record count guards in update script
@@ -633,7 +670,7 @@ Verified against 3+ independent sources: official lottery websites (powerball.co
 12. **State tax as TypeScript file** — Allows auto-updates via Claude API while keeping type safety; imported directly by components
 13. **Self-sufficient automation** — Daily data + blog, weekly dataset monitoring, quarterly tax updates — all zero-touch after initial setup
 14. **Shared retry utility** — `scripts/lib/retry.ts` provides exponential backoff for all API calls; centralized so behavior is consistent
-15. **Centralized model constant** — `scripts/lib/constants.ts` exports `CLAUDE_MODEL` so model rotation only requires one change
+15. **Centralized automation constants** — `scripts/lib/constants.ts` exports `CLAUDE_MODEL`, `MIN_DRAWS`, `MIN_PAGES`, `LOTTERY_DATA_FILES`, etc. so thresholds and config only need one change
 16. **Failure notifications via GitHub Issues** — All workflows create/comment on issues with `automation-failure` label; deduplication prevents spam
 17. **Stale data detection** — Per-game staleness thresholds with `.stale-warning` marker file; retired games (e.g., Cash4Life) are automatically excluded
 18. **Tax rate sanity bounds** — Rejects Claude-suggested rates > 15% or changes > 3pp to guard against hallucinations; line-based file editing replaces brittle regex

@@ -89,6 +89,7 @@ export const lotteries: Record<string, LotteryConfig> = {
     },
     website: 'https://nylottery.ny.gov/cash4life',
     startYear: 2014,
+    retiredDate: '2026-02-21',
   },
   'ny-lotto': {
     id: 'ny-lotto',

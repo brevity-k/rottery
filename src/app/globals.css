@@ -24,3 +24,26 @@ body {
     box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
   }
 }
+
+@media print {
+  header, footer, nav[aria-label="Breadcrumb"], button, .fixed {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  table {
+    border-collapse: collapse;
+  }
+  th, td {
+    border: 1px solid #d1d5db;
+  }
+  * {
+    box-shadow: none !important;
+  }
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+}
