@@ -31,51 +31,73 @@ export default function MethodologyPage() {
 
         <Card className="mb-8">
           <div className="prose prose-gray max-w-none">
-            <h2 className="text-xl font-bold text-gray-900 mt-0">Frequency Analysis</h2>
-            <p>Frequency analysis counts how often each number has appeared across all historical draws. For each number, we calculate:</p>
-            <ul>
-              <li><strong>Total appearances:</strong> The raw count of how many times a number has been drawn</li>
-              <li><strong>Frequency percentage:</strong> Appearances divided by total draws — for Powerball white balls (5 drawn from 69), the expected frequency is approximately 7.25% per draw (5/69)</li>
-              <li><strong>Deviation from expected:</strong> How far above or below the statistical average a number falls</li>
-            </ul>
-            <p>We calculate frequency separately for main numbers and bonus numbers, since they are drawn from different pools with different expected rates.</p>
+            <p>MyLottoStats.com analyzes historical lottery draw data to identify patterns and trends. <strong>It is important to understand that lottery drawings are random events, and no analysis can predict future outcomes.</strong> Our tools are provided for informational and entertainment purposes only. Past performance does not guarantee or influence future results.</p>
 
-            <h2 className="text-xl font-bold text-gray-900">Hot &amp; Cold Number Scoring</h2>
-            <p>Our hot and cold system uses a <strong>weighted scoring model</strong> across three time horizons:</p>
+            <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Frequency Analysis</h2>
+            <p>Frequency analysis counts how many times each number has appeared across all historical draws in our database. This method answers the question: <em>&quot;Which numbers appear most often?&quot;</em></p>
+            <p><strong>How it works:</strong></p>
             <ul>
-              <li><strong>Recent draws (last 20):</strong> Weighted 3x — captures current momentum</li>
-              <li><strong>Medium-term (last 100 draws):</strong> Weighted 2x — smooths short-term noise</li>
-              <li><strong>All-time history:</strong> Weighted 1x — provides a baseline reference</li>
+              <li>We count the total occurrences of each number from all draws</li>
+              <li>We calculate the percentage: (number of times drawn &divide; total draws) &times; 100</li>
+              <li>We track when each number was last drawn</li>
+              <li>Results are sorted from most frequent to least frequent</li>
             </ul>
-            <p>The composite score determines whether a number is classified as Hot (above average across all horizons), Warm (mixed signals), or Cold (below average). This multi-horizon approach avoids the pitfalls of relying on a single time frame — a number can be historically cold but recently hot, and our scoring reflects this nuance.</p>
+            <p><strong>Why it&apos;s interesting:</strong> While lottery drawings are random, seeing which numbers have historically appeared most or least frequently can satisfy curiosity about draw patterns. Some players believe frequently appearing numbers will continue to appear, though statistically each draw is independent.</p>
 
-            <h2 className="text-xl font-bold text-gray-900">Overdue Analysis</h2>
-            <p>For each number, we track two metrics:</p>
+            <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Hot &amp; Cold Numbers</h2>
+            <p>This method identifies numbers trending upward (hot) versus numbers rarely appearing recently (cold). Unlike simple frequency analysis, it <em>weights recent draws more heavily</em> than older ones.</p>
+            <p><strong>How it works:</strong></p>
             <ul>
-              <li><strong>Current gap:</strong> How many consecutive draws have passed without this number appearing</li>
-              <li><strong>Expected interval:</strong> The statistically expected gap between appearances, calculated as total numbers in the pool divided by numbers drawn per draw (e.g., for Powerball white balls: 69/5 = ~13.8 draws)</li>
+              <li><strong>Recent performance (last 20 draws):</strong> weighted 3&times; their actual count</li>
+              <li><strong>Medium-term performance (last 100 draws):</strong> weighted 2&times; their count</li>
+              <li><strong>All-time performance:</strong> weighted 1&times; their count</li>
+              <li>Numbers are scored using: (recent &times; 3) + (medium &times; 2) + (all-time &times; 1)</li>
+              <li>Numbers are ranked and divided into thirds: <strong>hot</strong> (top third), <strong>warm</strong> (middle third), and <strong>cold</strong> (bottom third)</li>
             </ul>
-            <p>The <strong>overdue ratio</strong> is the current gap divided by the expected interval. A ratio above 1.0 means the number has been absent longer than average. A ratio of 2.0 means it has been absent twice as long as expected. Note: being overdue does not make a number more likely to appear — each draw is independent.</p>
+            <p><strong>Why it&apos;s interesting:</strong> This approach captures the idea that current lottery activity may differ from historical averages. Some players prefer numbers showing recent momentum, even though future draws remain completely random.</p>
 
-            <h2 className="text-xl font-bold text-gray-900">Pair, Triplet &amp; Quadruplet Analysis</h2>
-            <p>We examine every possible two-number, three-number, and four-number combination across all historical draws:</p>
+            <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Overdue Analysis</h2>
+            <p>Overdue analysis measures how long it has been since each number was last drawn, compared to how frequently we&apos;d <em>expect</em> it to be drawn based on history.</p>
+            <p><strong>How it works:</strong></p>
             <ul>
-              <li><strong>Pairs:</strong> Every combination of 2 numbers from each draw — for a 5-number draw, that is C(5,2) = 10 pairs per draw</li>
-              <li><strong>Triplets:</strong> Every combination of 3 numbers — C(5,3) = 10 triplets per draw</li>
-              <li><strong>Quadruplets:</strong> Every combination of 4 numbers — C(5,4) = 5 quadruplets per draw</li>
+              <li>For each number, we count: <strong>draws since last appearance</strong></li>
+              <li>We calculate the <strong>expected interval:</strong> total draws &divide; number of times it appeared</li>
+              <li>We compute the <strong>overdue ratio:</strong> (draws since last &divide; expected interval)</li>
+              <li>An overdue ratio of 1.0 means the number is exactly on schedule; 1.5 means it&apos;s 50% overdue relative to its historical frequency</li>
             </ul>
-            <p>We rank combinations by frequency and surface the most common co-occurrences. This adds a relationship dimension to the analysis — which numbers tend to appear together.</p>
+            <p><strong>Why it&apos;s interesting:</strong> Some players believe numbers that haven&apos;t appeared recently are &quot;due&quot; to come up soon (the gambler&apos;s fallacy). While mathematically unfounded, tracking this metric allows players to explore this theory.</p>
 
-            <h2 className="text-xl font-bold text-gray-900">Recommendation Engine</h2>
-            <p>Our recommendation engine blends multiple statistical signals into a composite score for each number. We offer three strategies:</p>
+            <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Pair &amp; Triplet Analysis</h2>
+            <p>This analysis examines which combinations of numbers appear together most frequently in draw results. It looks for numbers that tend to be drawn alongside each other.</p>
+            <p><strong>How it works:</strong></p>
             <ul>
-              <li><strong>Balanced:</strong> 30% frequency + 30% hot/cold trend + 25% overdue + 15% pair bonus — a diversified approach</li>
+              <li>We examine every draw and identify all pairs of numbers that appeared together</li>
+              <li>We count how many times each pair has been drawn</li>
+              <li>We calculate the percentage: (pair occurrences &divide; total draws) &times; 100</li>
+              <li>The top 20 most frequent pairs are displayed</li>
+            </ul>
+            <p><strong>Why it&apos;s interesting:</strong> Numbers drawn together might seem correlated, but this is actually a natural result of random sampling. Displaying pair frequencies helps players understand distribution patterns and create their own custom selections based on combinations they prefer.</p>
+
+            <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Recommendation Engine</h2>
+            <p>Our recommendation system generates customized number sets based on multiple analysis methods combined. It scores numbers using a weighted strategy approach.</p>
+            <p><strong>How it works:</strong></p>
+            <ul>
+              <li><strong>Frequency component:</strong> Numbers appearing most often historically receive higher scores</li>
+              <li><strong>Hot component:</strong> Recently trending numbers receive higher scores</li>
+              <li><strong>Overdue component:</strong> Numbers with high overdue ratios receive higher scores</li>
+              <li><strong>Pair bonus:</strong> Numbers appearing frequently in top pairs receive slight score boosts</li>
+              <li>Each component&apos;s importance is controlled by the selected strategy</li>
+              <li>The engine generates multiple unique sets to provide variety</li>
+              <li>Each recommendation includes a confidence score (0&ndash;100) based on the average score of selected numbers</li>
+            </ul>
+            <p><strong>Available Strategies:</strong></p>
+            <ul>
+              <li><strong>Balanced:</strong> 30% frequency + 30% hot/cold + 25% overdue + 15% pair bonus — a diversified approach</li>
               <li><strong>Trending:</strong> 20% frequency + 50% hot/cold + 15% overdue + 15% pair bonus — favors recent momentum</li>
               <li><strong>Contrarian:</strong> 15% frequency + 10% hot/cold + 60% overdue + 15% pair bonus — targets statistically overdue numbers</li>
             </ul>
-            <p>For each strategy, we generate 3 sets of numbers. The pair bonus adds extra weight to numbers that frequently co-occur with other high-scoring numbers in the selection. The engine never duplicates numbers within a set and respects each game&apos;s format (e.g., 5 main + 1 bonus for Powerball, 5 main with no bonus for Take 5).</p>
 
-            <h2 className="text-xl font-bold text-gray-900">Data Sources &amp; Integrity</h2>
+            <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Data Sources &amp; Integrity</h2>
             <p>All lottery data comes from the <strong>NY Open Data SODA API</strong> (data.ny.gov), a government-operated data platform. We fetch data daily and apply automated validation:</p>
             <ul>
               <li>Number range checks against each game&apos;s known format</li>
@@ -84,9 +106,11 @@ export default function MethodologyPage() {
               <li>Record count guards (data can never shrink between updates)</li>
             </ul>
 
-            <h2 className="text-xl font-bold text-gray-900">Important Limitations</h2>
-            <p>All lottery drawings are <strong>independent random events</strong>. Each ball drawn has no memory of previous results. Our statistical analysis describes historical patterns — it does <strong>not predict future outcomes</strong>. Hot numbers are not more likely to appear next, and overdue numbers are not &quot;due&quot; for a correction.</p>
-            <p>Modern lottery drawing machines are rigorously tested and regulated. Observed frequency variations in historical data are the natural result of randomness, not evidence of bias. Our tools are designed to make number exploration more engaging and data-driven, but they offer no advantage over random selection.</p>
+            <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Important Disclaimers</h2>
+            <p><strong>Randomness and Independence:</strong> Every lottery drawing is a random, independent event. Previous results do not influence future drawings. The probability of each number being drawn remains constant regardless of past performance.</p>
+            <p><strong>Gambler&apos;s Fallacy:</strong> The belief that a number is &quot;due&quot; or that past patterns predict future results is a common misconception. No analysis method changes the mathematical reality that each draw is random.</p>
+            <p><strong>Entertainment Only:</strong> MyLottoStats.com provides these analysis tools for educational and entertainment purposes. We do not guarantee accuracy, and we strongly advise that lottery play should only occur with money you can afford to lose. Please play responsibly.</p>
+            <p><strong>Data Accuracy:</strong> While we strive to maintain accurate historical data, we recommend verifying any important information through official lottery sources.</p>
           </div>
         </Card>
 
