@@ -9,4 +9,4 @@ export const DISCLAIMER_TEXT =
 
 export const AD_CLIENT_ID = '';
 
-export const ANALYTICS_ID = '';
+export const ANALYTICS_ID = 'G-5TW1TM399X';
