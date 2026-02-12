@@ -50,14 +50,13 @@ interface GeneratedStateConfig {
 
 function getExistingStateSlugs(): string[] {
   const content = fs.readFileSync(CONFIG_FILE, 'utf-8');
-  const matches = content.matchAll(/['"]([a-z-]+)['"]\s*:\s*\{/g);
+  // Match both quoted and unquoted object keys: 'new-york': { or california: {
+  // Only match keys at 2-space indent level (direct children of stateConfigs)
+  const matches = content.matchAll(/^ {2}(?:'([a-z-]+)'|([a-z]+)):\s*\{/gm);
   const slugs: string[] = [];
   for (const m of matches) {
-    // Only capture object keys inside stateConfigs that look like state slugs
-    if (m[1] && !['name', 'abbreviation', 'slug', 'availableGames', 'taxRate', 'taxNotes',
-      'lotteryWebsite', 'claimInfo', 'purchaseAge', 'facts'].includes(m[1])) {
-      slugs.push(m[1]);
-    }
+    const slug = m[1] || m[2];
+    if (slug) slugs.push(slug);
   }
   return slugs;
 }

@@ -10,7 +10,7 @@ My Lotto Stats is a free, SEO-optimized lottery information website that provide
 **Hosting:** Vercel (auto-deploys on push)
 **Google Analytics:** G-5TW1TM399X
 **Google Search Console:** Verified + sitemap submitted
-**Current page count:** 563 static pages + 1 serverless API route
+**Current page count:** 599 static pages + 1 serverless API route
 
 ---
 
@@ -478,7 +478,7 @@ The GitHub Actions workflow runs daily at 6 AM UTC:
 
 ## State Lottery Hubs
 
-10 state hub pages at `/states/[state]`:
+46 state hub pages at `/states/[state]`:
 
 | State | Slug | Tax Rate | Games | Notes |
 |---|---|---|---|---|
