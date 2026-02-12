@@ -66,6 +66,7 @@ rottery/
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx                # Root layout (Header + Footer + GA + Search Console)
+│   │   ├── icon.svg                  # SVG favicon (lottery ball with blue-purple gradient + star)
 │   │   ├── page.tsx                  # Homepage: lottery grid + hero
 │   │   ├── sitemap.ts               # Dynamic sitemap (lotteries + blog + states + tools)
 │   │   ├── robots.ts                # robots.txt generator
@@ -633,3 +634,4 @@ Verified against 3+ independent sources: official lottery websites (powerball.co
 16. **Failure notifications via GitHub Issues** — All workflows create/comment on issues with `automation-failure` label; deduplication prevents spam
 17. **Stale data detection** — Per-game staleness thresholds with `.stale-warning` marker file; retired games (e.g., Cash4Life) are automatically excluded
 18. **Tax rate sanity bounds** — Rejects Claude-suggested rates > 15% or changes > 3pp to guard against hallucinations; line-based file editing replaces brittle regex
+19. **SVG favicon** — `src/app/icon.svg` lottery ball with blue-purple gradient and white star; Next.js auto-serves via file convention (no `<link>` tag needed)
