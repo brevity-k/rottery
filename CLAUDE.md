@@ -1,10 +1,15 @@
-# Rottery - AI-Powered Lottery Number Insights & Statistics
+# My Lotto Stats - AI-Powered Lottery Number Insights & Statistics
 
 ## Project Overview
 
-Rottery is a free, SEO-optimized, statically-generated lottery information website that provides statistical analysis and number recommendations for US lotteries. Revenue model: Google AdSense (Phase 2+). No database, no backend, no serverless functions at runtime.
+My Lotto Stats is a free, SEO-optimized lottery information website that provides statistical analysis and number recommendations for US lotteries. Revenue model: Google AdSense (Phase 2+). Hybrid rendering: static pages + serverless API routes on Vercel.
 
-**Live repo:** https://github.com/brevity-k/rottery
+**Live site:** https://mylottostats.com
+**Live repo:** https://github.com/brevity-k/lottery
+**Domain registrar:** Porkbun
+**Hosting:** Vercel (auto-deploys on push)
+**Google Analytics:** G-5TW1TM399X
+**Google Search Console:** Verified + sitemap submitted
 
 ---
 
@@ -12,19 +17,23 @@ Rottery is a free, SEO-optimized, statically-generated lottery information websi
 
 ```
 [Build Time]  SODA API JSON files ──> Next.js SSG ──> Static HTML ──> Vercel CDN
-[Runtime]     Client-side only: number generator, chart interactions
-[Daily Cron]  GitHub Action fetches latest data ──> git push ──> Vercel rebuild
+[Runtime]     Client-side: number generator, chart interactions
+[Runtime]     Serverless: /api/contact (Resend email)
+[Daily Cron]  GitHub Action fetches latest data + generates blog ──> git push ──> Vercel rebuild
 ```
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 16 (App Router, `output: 'export'`) |
+| Framework | Next.js 16 (App Router, hybrid: static + serverless) |
 | Language | TypeScript (strict mode) |
 | Styling | Tailwind CSS v4 |
 | Charts | Recharts 3 |
+| Email | Resend (contact form auto-reply) |
 | Data source | NY Open Data SODA API (free, no key) |
 | Data storage | JSON files in `src/data/` |
-| Hosting target | Vercel free tier (static export) |
+| Blog generation | Claude Haiku via Anthropic API (daily, automated) |
+| Hosting | Vercel free tier |
+| DNS | Porkbun → Vercel (A: 76.76.21.21, CNAME: cname.vercel-dns.com) |
 
 ---
 
@@ -33,10 +42,10 @@ Rottery is a free, SEO-optimized, statically-generated lottery information websi
 ```
 rottery/
 ├── src/
-│   ├── app/                          # Next.js App Router pages
-│   │   ├── layout.tsx                # Root layout (Header + Footer)
+│   ├── app/
+│   │   ├── layout.tsx                # Root layout (Header + Footer + GA + Search Console)
 │   │   ├── page.tsx                  # Homepage: lottery grid + hero
-│   │   ├── sitemap.ts               # Dynamic sitemap (24 URLs)
+│   │   ├── sitemap.ts               # Dynamic sitemap
 │   │   ├── robots.ts                # robots.txt generator
 │   │   ├── [lottery]/               # /powerball, /mega-millions
 │   │   │   ├── page.tsx             # Lottery overview + latest results + FAQ
@@ -44,10 +53,12 @@ rottery/
 │   │   │   ├── results/page.tsx     # Full results history
 │   │   │   ├── results/[year]/      # Results by year (2002-2026)
 │   │   │   └── statistics/page.tsx  # Frequency charts, hot/cold, overdue, pairs
+│   │   ├── api/contact/route.ts     # Serverless: Resend email API
+│   │   ├── contact/page.tsx         # Contact form page
 │   │   ├── tools/
 │   │   │   ├── number-generator/    # Crypto-random number generator
 │   │   │   └── odds-calculator/     # Lottery odds breakdown
-│   │   ├── blog/                    # Blog index + 8 article pages
+│   │   ├── blog/                    # Blog index + article pages
 │   │   │   └── [slug]/page.tsx
 │   │   ├── about/page.tsx           # Required for AdSense
 │   │   ├── privacy/page.tsx         # Required for AdSense
@@ -57,6 +68,7 @@ rottery/
 │   │   ├── layout/    Header, Footer, Breadcrumbs
 │   │   ├── lottery/   LotteryCard, LotteryBall, ResultsTable, JackpotDisplay
 │   │   ├── numbers/   NumberGenerator, HotColdChart, RecommendedNumbers
+│   │   ├── contact/   ContactForm (client component)
 │   │   ├── ads/       AdUnit (placeholder, renders when ADSENSE_CLIENT_ID set)
 │   │   ├── seo/       JsonLd
 │   │   └── ui/        Button, Card, Tabs
@@ -68,81 +80,18 @@ rottery/
 │   │   ├── blog.ts    Static blog post content + getters
 │   │   └── utils/     formatters.ts, constants.ts
 │   └── data/
-│       ├── powerball.json           # 1,900 draws (2010-02-03 to present)
-│       └── mega-millions.json       # 2,474 draws (2002-05-17 to present)
+│       ├── powerball.json           # ~1,900 draws (2010-02-03 to present)
+│       └── mega-millions.json       # ~2,474 draws (2002-05-17 to present)
 ├── scripts/
-│   └── update-data.ts               # SODA API fetcher (run via `npx tsx`)
+│   ├── update-data.ts               # SODA API fetcher (run via `npx tsx`)
+│   └── generate-blog-post.ts        # Claude-powered daily blog generation
 ├── .github/workflows/
-│   └── update-lottery-data.yml      # Daily cron at 5 AM UTC
+│   └── update-lottery-data.yml      # Daily cron at 6 AM UTC
+├── content/blog/                    # Auto-generated daily blog posts (JSON)
 ├── public/
 │   └── ads.txt                      # AdSense placeholder
-└── content/blog/                    # Reserved for future MDX posts
+└── .env.local                       # RESEND_API_KEY (not committed)
 ```
-
----
-
-## What Was Built (Phase 1 MVP)
-
-### Pages: 68 static HTML pages
-
-| Route | Count | Description |
-|---|---|---|
-| `/` | 1 | Homepage with hero + lottery grid |
-| `/[lottery]` | 2 | Powerball & Mega Millions overview |
-| `/[lottery]/numbers` | 2 | AI-powered number recommendations |
-| `/[lottery]/results` | 2 | Full results history |
-| `/[lottery]/results/[year]` | 42 | Year-by-year archives (2002-2026) |
-| `/[lottery]/statistics` | 2 | Frequency, hot/cold, overdue, pairs |
-| `/tools/*` | 2 | Number generator, odds calculator |
-| `/blog` + `/blog/[slug]` | 9 | Blog index + 8 articles |
-| Legal pages | 4 | About, Privacy, Terms, Disclaimer |
-| SEO files | 2 | sitemap.xml, robots.txt |
-
-### Analysis Engine
-
-All analysis runs at build time on historical draw data:
-
-1. **Frequency Analysis** (`lib/analysis/frequency.ts`) - Count per number, percentage, last drawn, draws since last drawn
-2. **Hot/Cold Scoring** (`lib/analysis/hotCold.ts`) - Weighted: recent (last 20) 3x, medium (last 100) 2x, all-time 1x
-3. **Overdue Detection** (`lib/analysis/overdue.ts`) - Compares current gap to expected interval, calculates overdue ratio
-4. **Gap Analysis** (`lib/analysis/gaps.ts`) - Min/max/avg gaps between appearances per number
-5. **Pair Frequency** (`lib/analysis/pairs.ts`) - Most frequently co-occurring number pairs
-6. **Recommendations** (`lib/analysis/recommendations.ts`) - Combines all signals with strategy weights
-
-### Recommendation Strategies
-
-| Strategy | Freq | Hot | Overdue | Pairs | Description |
-|---|---|---|---|---|---|
-| Balanced | 0.30 | 0.30 | 0.25 | 0.15 | Well-rounded blend |
-| Trending | 0.20 | 0.50 | 0.15 | 0.15 | Favors recent momentum |
-| Contrarian | 0.15 | 0.10 | 0.60 | 0.15 | Targets overdue numbers |
-
-### Data Sources
-
-| Lottery | SODA API Endpoint | Draws | Date Range |
-|---|---|---|---|
-| Powerball | `data.ny.gov/resource/d6yy-54nr.json` | 1,900 | 2010-02-03 to present |
-| Mega Millions | `data.ny.gov/resource/5xaw-6ayf.json` | 2,474 | 2002-05-17 to present |
-
-### SEO
-
-- Unique `<title>` and `<meta description>` per page via `generateMetadata`
-- JSON-LD: WebSite, BreadcrumbList, FAQPage, Article, SoftwareApplication
-- Breadcrumb navigation on all inner pages
-- Clean URL structure: `/powerball/numbers`, `/mega-millions/statistics`
-- sitemap.xml with 24 URLs and priority/changefreq
-- robots.txt allowing all crawlers
-
-### Blog Articles (8 posts)
-
-1. How Powerball Works: Complete Guide
-2. Powerball Odds Explained
-3. Mega Millions vs Powerball Comparison
-4. What Are Hot and Cold Numbers?
-5. How to Pick Lottery Numbers: Statistical Approach
-6. Biggest Lottery Jackpots in US History
-7. How Mega Millions Works: Complete Guide
-8. Understanding Number Frequency
 
 ---
 
@@ -151,11 +100,12 @@ All analysis runs at build time on historical draw data:
 ```bash
 # Development
 npm run dev                    # Start dev server (http://localhost:3000)
-npm run build                  # Build static export to out/
+npm run build                  # Build for production
 npm run start                  # Serve production build
 
 # Data updates
-npx tsx scripts/update-data.ts # Fetch latest draws from SODA API
+npx tsx scripts/update-data.ts          # Fetch latest draws from SODA API
+npx tsx scripts/generate-blog-post.ts   # Generate daily blog post (needs ANTHROPIC_API_KEY)
 
 # Lint
 npm run lint                   # ESLint check
@@ -163,193 +113,231 @@ npm run lint                   # ESLint check
 
 ---
 
-## Daily Data Update Flow
-
-The GitHub Actions workflow (`.github/workflows/update-lottery-data.yml`) runs daily at 5 AM UTC:
-
-1. Checkout repo
-2. Install dependencies (`npm ci`)
-3. Run `npx tsx scripts/update-data.ts` (fetches from SODA API)
-4. Check if `src/data/` files changed
-5. If changed: commit + push → triggers Vercel rebuild
-6. All static pages regenerated with fresh data
-
-**Cost: $0** (GitHub Actions free for public repos, Vercel rebuilds free)
-
----
-
-## Deployment Plan
-
-### Step 1: Connect to Vercel
-
-1. Go to https://vercel.com and sign in with GitHub
-2. Click "Add New Project" → Import `brevity-k/rottery`
-3. Framework preset: **Next.js** (auto-detected)
-4. Build command: `npm run build` (default)
-5. Output directory: `out` (auto-detected from `output: 'export'`)
-6. Click Deploy
-
-### Step 2: Custom Domain (Optional)
-
-1. In Vercel project settings → Domains
-2. Add `rottery.com` (or your domain)
-3. Update DNS records as instructed by Vercel
-4. SSL is automatic
-
-### Step 3: Google Search Console
-
-1. Go to https://search.google.com/search-console
-2. Add property → URL prefix → enter your domain
-3. Verify via HTML file or DNS record
-4. Submit sitemap: `https://yourdomain.com/sitemap.xml`
-
-### Step 4: Enable GitHub Actions
-
-1. In GitHub repo → Settings → Actions → General
-2. Ensure "Allow all actions" is enabled
-3. The daily cron will auto-run, or trigger manually from Actions tab
-
-### Step 5: AdSense Application (Phase 2 — after 50+ quality pages)
-
-See "AdSense Setup" section below.
-
----
-
-## AdSense Setup (What the User Must Provide)
-
-### Prerequisites Before Applying
-
-Google AdSense requires:
-- A live website with **original, quality content** (50+ pages recommended)
-- Required legal pages: **About, Privacy Policy, Terms of Service, Disclaimer** (all included)
-- Site must be **informational only** — no ticket sales or gambling promotion (compliant)
-- Content must have **500+ words per page** on key pages (blog posts meet this)
-- Site should be **at least 1-3 months old** with some organic traffic
-
-### Application Process
-
-1. Go to https://www.google.com/adsense/
-2. Sign in with a Google account
-3. Enter your site URL
-4. Google reviews the site (typically 1-14 days)
-
-### After Approval — What to Configure
-
-The user must provide these values to enable ads:
-
-| Item | Where to Set | Description |
-|---|---|---|
-| **AdSense Publisher ID** | `NEXT_PUBLIC_ADSENSE_CLIENT_ID` env var | Format: `ca-pub-XXXXXXXXXXXXXXXX`. Set in Vercel project settings → Environment Variables |
-| **Ad Slot IDs** | Pass to `<AdUnit slot="..." />` in page components | Create ad units in AdSense dashboard, get slot IDs |
-| **ads.txt content** | `public/ads.txt` | Replace placeholder with: `google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0` |
-| **AdSense script** | Add to `src/app/layout.tsx` `<head>` | `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>` |
-
-### How to Enable Ads in Code
-
-1. Set the environment variable in Vercel:
-   ```
-   NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-XXXXXXXXXXXXXXXX
-   ```
-
-2. Add the AdSense script to `src/app/layout.tsx`:
-   ```tsx
-   <head>
-     <script
-       async
-       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
-       crossOrigin="anonymous"
-     />
-   </head>
-   ```
-
-3. Add `<AdUnit>` components to pages where ads should appear:
-   ```tsx
-   import AdUnit from '@/components/ads/AdUnit';
-   // In the page JSX:
-   <AdUnit slot="1234567890" format="rectangle" />
-   ```
-
-4. Update `public/ads.txt` with your publisher ID
-
-5. Redeploy
-
-### Recommended Ad Placements (3-4 per page)
-
-| Position | Desktop Format | Mobile Format |
-|---|---|---|
-| Sidebar | 300x250 + 300x600 (sticky) | N/A |
-| In-content | 728x90 leaderboard | 320x100 banner |
-| Below results | 300x250 rectangle | 300x250 rectangle |
-| Bottom | 728x90 leaderboard | Anchor ad (auto) |
-
-### AdSense Compliance Rules
-
-- Position as **lottery information & statistics** — never transactional
-- Never link to ticket purchase sites
-- Use "statistical analysis," "frequency trends," "insights" — never "prediction," "guaranteed," or "winning strategy"
-- Keep disclaimer on every recommendation page (already implemented)
-- Never sell tickets or facilitate gambling
-
----
-
 ## Environment Variables
 
-| Variable | Required | Description |
-|---|---|---|
-| `NEXT_PUBLIC_ADSENSE_CLIENT_ID` | No (Phase 2) | Google AdSense publisher ID |
-| `NEXT_PUBLIC_ANALYTICS_ID` | No | Google Analytics measurement ID |
+| Variable | Required | Where Set | Description |
+|---|---|---|---|
+| `RESEND_API_KEY` | Yes | Vercel + `.env.local` | Resend API key for contact form emails |
+| `ANTHROPIC_API_KEY` | No | GitHub Secrets | For auto blog generation in GitHub Actions |
+| `NEXT_PUBLIC_ADSENSE_CLIENT_ID` | No (Phase 2) | Vercel | Google AdSense publisher ID |
 
 ---
 
-## Phase Roadmap
+## Competitive Landscape
+
+### Top Competitors (by US traffic)
+
+| Rank | Site | Monthly Visits | Key Differentiator |
+|---|---|---|---|
+| 1 | lotterypost.com | ~14.2M | Community forums (7.7M+ posts) |
+| 2 | lotteryusa.com | ~5M+ | 240+ games, est. 1995, state coverage |
+| 3 | lottonumbers.com | Moderate | Deep statistical analysis, 52% search traffic |
+| 4 | usamega.com | Moderate | Best-in-class tax/payout calculator |
+| 5 | lotteryvalley.com | Growing | AI predictions, 300+ games, 9 tools |
+| 6 | lottostrategies.com | Moderate | 21 analysis algorithms |
+
+### Feature Gap Analysis
+
+| Feature | Competitors | My Lotto Stats | Priority |
+|---|---|---|---|
+| Multi-state game results | 240+ games | 2 games | HIGH |
+| State lottery hubs (50 states) | All majors have it | None | HIGH |
+| Tax/payout calculator | USAMega, LotteryUSA, Powerball.net | None | HIGH |
+| Ticket/number checker | LotteryUSA, Powerball.net, LotteryValley | None | MEDIUM |
+| Per-number analysis pages | Powerball.net, LottoNumbers | None | MEDIUM |
+| Triplet/quadruplet analysis | LottoNumbers, Powerball.net | None | MEDIUM |
+| Pick 3/4 daily games | LotteryUSA, LottoStrategies, LotteryCorner | None | MEDIUM |
+| Community/forums | LotteryPost, LotteryUSA | None | LOW |
+| Scratch-off analysis | LotteryValley | None | LOW |
+
+### Our Competitive Advantages
+
+1. **Zero operating cost** — static pages, free APIs, free hosting
+2. **Modern tech stack** — Next.js 16, Tailwind v4, clean responsive UI
+3. **AI-powered analysis branding** — unique positioning vs. competitors
+4. **Multi-strategy recommendation engine** — most competitors lack this
+5. **Automated daily blog generation** — builds content and SEO authority automatically
+6. **Full SEO infrastructure** — JSON-LD, sitemap, robots, per-page metadata
+
+---
+
+## SEO Strategy
+
+### Target Keywords (by priority)
+
+**Tier 1 — Statistical analysis (our sweet spot, lower competition):**
+- "most common powerball numbers"
+- "powerball number frequency"
+- "hot and cold lottery numbers"
+- "overdue powerball numbers"
+- "mega millions statistics"
+- "powerball number pairs"
+
+**Tier 2 — Educational/guide content:**
+- "how to pick powerball numbers statistically"
+- "powerball vs mega millions which is better"
+- "how does power play work"
+- "powerball odds of winning each prize"
+
+**Tier 3 — Tool-based traffic:**
+- "powerball number generator"
+- "lottery probability calculator"
+- "mega millions tax calculator by state"
+- "check my powerball numbers"
+
+**Tier 4 — State-specific long tail (future):**
+- "powerball winners in [state]"
+- "lottery tax rate [state]"
+- "mega millions results [state]"
+
+### SEO Best Practices
+
+- **Intent-first title tags:** "Powerball Results Today [Date] | Winning Numbers & Statistics" (not brand-first)
+- **Featured snippet optimization:** Answer queries in 40-60 words directly after H2 headings
+- **Table snippets:** Clean HTML tables for odds, prize charts (Google pulls these)
+- **FAQ schema:** FAQPage JSON-LD on every game overview page with 8-10 high-search-volume questions
+- **Internal linking:** Every results page links to statistics, numbers, and blog posts
+- **Content freshness:** Results updated daily via GitHub Actions; timestamp displayed on pages
+
+### E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness)
+
+This site falls under **YMYL (Your Money Your Life)** — Google applies higher standards:
+
+- **Experience:** Show real calculations, methodology transparency, interactive tools
+- **Expertise:** Cite data sources, mathematical rigor, never claim "prediction"
+- **Authoritativeness:** Comprehensive coverage, regular publishing, linkable data visualizations
+- **Trustworthiness:** Legal pages, disclaimers, "verify with official lottery" language, responsible gambling messaging
+
+---
+
+## Data Validation & Credibility
+
+### Current Data Source
+
+NY Open Data SODA API (government source):
+- Powerball: `data.ny.gov/resource/d6yy-54nr.json`
+- Mega Millions: `data.ny.gov/resource/5xaw-6ayf.json`
+
+### Required Validation Rules
+
+**Structural validation (automated in update script):**
+- Number ranges match game format (1-69 main, 1-26 bonus for Powerball; 1-70 main, 1-24 bonus for Mega Millions)
+- Correct number of balls per draw (5 main + 1 bonus)
+- Draw dates align with expected schedule (Mon/Wed/Sat for PB, Tue/Fri for MM)
+- No duplicate draw dates
+- Record count never decreases between updates
+
+**Temporal validation:**
+- Draws appear in chronological order
+- No missing draw dates (gaps in expected schedule)
+- No future-dated draws
+
+**Cross-referencing (recommended for Phase 2):**
+- Validate against a secondary source (official lottery website or second API)
+- Flag discrepancies for manual review before publishing
+
+### Required Disclaimers
+
+Every results page and analysis page must include:
+1. **Unofficial status:** "This website is not affiliated with or endorsed by Powerball, Mega Millions, MUSL, or any state lottery commission"
+2. **Official numbers control:** "In the event of a discrepancy, official winning numbers as certified by the Multi-State Lottery Association shall control"
+3. **Verification directive:** "Always verify results with your official state lottery"
+4. **Entertainment only:** All analysis is for informational and entertainment purposes
+5. **No prediction claims:** Statistical analysis examines historical patterns but does not predict future outcomes
+6. **Data source attribution:** "Results sourced from NY Open Data (data.ny.gov)"
+7. **Responsible gambling:** National Council on Problem Gambling helpline: 1-800-522-4700
+
+### Format Change Monitoring
+
+Lottery game formats change every 3-8 years. The April 2025 Mega Millions overhaul is a recent example ($2→$5, bonus range 25→24, Megaplier retired).
+
+**Monitoring approach:**
+- Automated range anomaly detection in update script
+- Google Alerts for "Powerball rule change" and "Mega Millions rule change"
+- Quarterly manual fact-check against official lottery websites
+- Document all verified facts in this file (see Verified Information section below)
+
+---
+
+## Phase Roadmap (Updated February 2026)
 
 ### Phase 1: Core MVP (COMPLETE)
-- [x] Next.js 15 + TypeScript + Tailwind CSS
+- [x] Next.js 16 + TypeScript + Tailwind CSS
 - [x] Powerball & Mega Millions data from SODA API
 - [x] Analysis engine (frequency, hot/cold, overdue, gaps, pairs)
 - [x] Recommendation engine (3 strategies)
-- [x] 68 static pages
-- [x] 8 blog posts
+- [x] 74 static pages + 1 serverless API route
+- [x] 8 seed blog posts + daily auto-generated posts
 - [x] SEO (sitemap, robots, JSON-LD, metadata)
-- [x] GitHub Actions daily data update
+- [x] GitHub Actions daily data update + blog generation
 - [x] Legal pages (About, Privacy, Terms, Disclaimer)
+- [x] Contact form with Resend auto-reply email
+- [x] Google Analytics (G-5TW1TM399X)
+- [x] Google Search Console verified + sitemap submitted
+- [x] Custom domain (mylottostats.com via Porkbun)
+- [x] Vercel deployment with auto-deploy on push
 
-### Phase 2: Content Expansion (Target: 200+ pages)
-- [ ] Add Lucky for Life, Cash4Life, Lotto America
-- [ ] Add top 10 state lottery hubs
-- [ ] Tools improvements (interactive odds calculator)
-- [ ] 20 more blog posts
-- [ ] FAQ sections on all lottery pages
-- [ ] Apply for Google AdSense
+### Phase 2: High-Impact Content Expansion (Target: 300+ pages)
+
+**Priority 1 — Highest traffic impact:**
+- [ ] **Tax/payout calculator tool** — federal + state tax by state, lump sum vs annuity comparison (captures "mega millions after tax" queries — one of the highest-intent keywords)
+- [ ] **3 additional multi-state games** — Lucky for Life, Cash4Life, Lotto America (each adds overview, results, statistics, numbers, year archives = ~25 pages per game)
+- [ ] **Top 10 state lottery hubs** — CA, TX, FL, NY, PA, OH, IL, MI, GA, NC (each state page: available games, tax rates, claim procedures, where to buy = 10+ pages)
+
+**Priority 2 — SEO authority building:**
+- [ ] **Per-number analysis pages** — individual pages for each number (1-69 main + 1-26 bonus for Powerball = 95 pages; similar for MM). Each shows: frequency, last drawn, avg gap, most paired with
+- [ ] **Ticket/number checker tool** — user enters numbers + draw date, system checks against historical data (drives repeat visits)
+- [ ] **Triplet analysis** — expand pair analysis to triplets and quadruplets
+- [ ] **FAQ sections on all pages** — structured FAQPage schema for featured snippet eligibility
+
+**Priority 3 — Content depth:**
+- [ ] **20+ manual quality blog posts** targeting long-tail keywords: "powerball vs mega millions odds comparison", "lottery tax by state guide", "biggest lottery winners 2026"
+- [ ] **Jackpot tracker/history page** — current + historical jackpots with progression charts
+- [ ] **Enhanced disclaimer page** — add unofficial status, discrepancy clause, data source attribution, responsible gambling helpline
+- [ ] **Methodology page** — explain how statistical analyses are calculated (E-E-A-T signal)
+
+**Priority 4 — SEO optimization:**
+- [ ] **Intent-first title tags** on all pages
+- [ ] **"Last updated" timestamps** displayed on all results/statistics pages
+- [ ] **"Verify with official lottery" links** on every results table
+- [ ] **Responsible gambling notice** in site footer
+- [ ] **Increase internal linking** between results, statistics, and blog posts
+- [ ] Apply for Google AdSense (after 2-4 weeks of organic traffic)
 
 ### Phase 3: Full Coverage & Monetization (Target: 500+ pages)
-- [ ] All 45 state hubs + games
+- [ ] All 45 state hubs + state-specific game pages
+- [ ] Pick 3/Pick 4/daily game coverage (daily draws = massive page multiplication)
 - [ ] AdSense integration
+- [ ] Monthly archive pages (in addition to yearly)
 - [ ] "Share your numbers" social feature
-- [ ] Enhanced analysis (streaks, patterns)
-- [ ] 20 more blog posts
+- [ ] Enhanced analysis (streaks, patterns, bell curve visualization)
+- [ ] Email newsletter / jackpot alerts
 
 ### Phase 4: Growth Optimization
 - [ ] A/B test ad placements
-- [ ] PWA features (push notifications)
+- [ ] PWA features (push notifications for draw results)
+- [ ] Faster data updates (post-draw triggers, not just daily cron)
+- [ ] Multi-language support (Spanish)
+- [ ] Embeddable widgets for other sites (with attribution links)
 - [ ] Migrate to Mediavine at 50K sessions/mo
+- [ ] Consider freemium membership model
 
 ---
 
-## Automatic Data Update Plan
+## Daily Data Update Flow
 
-### How It Works
+The GitHub Actions workflow runs daily at 6 AM UTC:
 
-The site updates itself automatically with zero manual intervention:
+1. Checkout repo → Install dependencies
+2. Fetch latest lottery data from SODA API
+3. Generate daily blog post via Claude Haiku (if ANTHROPIC_API_KEY set)
+4. Check if data/blog files changed
+5. If changed: verify build succeeds → commit + push → Vercel auto-deploys
+6. All static pages regenerated with fresh data
 
-```
-[Draw happens ~11 PM ET] → [SODA API updates ~1-3 hours later]
-→ [GitHub Actions cron at 6 AM UTC / 1 AM ET] → [Fetches latest data]
-→ [Commits to repo if changed] → [Vercel auto-deploys on push]
-→ [All static pages rebuilt with fresh data]
-```
+**Cost: $0** (GitHub Actions free for public repos, Vercel rebuilds free, SODA API free)
 
-### Schedule
+### Draw Schedule
 
 | Day | What's Fetched | Draw That Occurred |
 |---|---|---|
@@ -361,44 +349,41 @@ The site updates itself automatically with zero manual intervention:
 | Sat 6AM UTC | Mega Millions Fri draw | Mega Millions (Fri 11 PM ET) |
 | Sun 6AM UTC | Powerball Sat draw | Powerball (Sat 10:59 PM ET) |
 
-The cron runs daily to ensure no draws are missed. On days without draws, the script detects no changes and skips the commit.
+---
 
-### Update Pipeline
+## Contact Form
 
-1. **GitHub Actions** (`.github/workflows/update-lottery-data.yml`) triggers daily at 6 AM UTC
-2. **Data fetch** (`scripts/update-data.ts`) calls SODA API for Powerball + Mega Millions
-3. **Change detection** — `git diff` checks if `src/data/` files actually changed
-4. **Build verification** — runs `npm run build` to ensure no broken pages
-5. **Commit + push** — only if data changed and build succeeds
-6. **Vercel auto-deploy** — Vercel watches the repo and rebuilds on any push
+- **API route:** `src/app/api/contact/route.ts` (serverless on Vercel)
+- **Email service:** Resend (`RESEND_API_KEY` in Vercel env vars + `.env.local`)
+- **From address:** `My Lotto Stats <onboarding@resend.dev>`
+- **Owner email:** `brevity1s.wos@gmail.com`
+- **Flow:** User submits form → owner gets notification email → sender gets auto-reply confirmation
+- **Env var:** `RESEND_API_KEY` must be set in Vercel project settings for production
 
-### Cost
+---
 
-- GitHub Actions: **$0** (free for public repos, ~2 min/run)
-- Vercel rebuilds: **$0** (free tier, 150K builds/mo)
-- SODA API: **$0** (free, no key required)
+## AdSense Setup
 
-### Manual Trigger
+### Prerequisites Before Applying
+- Live website with original, quality content (74+ pages — meets threshold)
+- Legal pages present: About, Privacy, Terms, Disclaimer
+- Informational only — no ticket sales or gambling promotion
+- 500+ words on key pages (blog posts meet this)
+- Site should be 1-3 months old with some organic traffic
+- **Wait 2-4 weeks** after launch for Google to index and traffic to build
 
-To update data manually at any time:
-```bash
-# Locally
-npx tsx scripts/update-data.ts
-npm run build
+### After Approval
+1. Set `NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-XXXXXXXXXXXXXXXX` in Vercel
+2. Add AdSense script to `src/app/layout.tsx` `<head>`
+3. Add `<AdUnit slot="..." />` components to pages
+4. Update `public/ads.txt` with publisher ID
+5. Redeploy
 
-# Or via GitHub Actions UI
-# Go to repo → Actions → "Update Lottery Data" → Run workflow
-```
-
-### What Gets Rebuilt
-
-When new data is committed, Vercel rebuilds ALL static pages:
-- Homepage (shows latest draw results)
-- Lottery overview pages (latest results table)
-- Numbers pages (recommendations recalculated from all historical data)
-- Statistics pages (frequency, hot/cold, overdue all updated)
-- Results pages (new draws appear in history)
-- Year archive pages (new year pages auto-generated via `generateStaticParams`)
+### Compliance Rules
+- Position as **lottery information & statistics** — never transactional
+- Never link to ticket purchase sites
+- Use "statistical analysis," "frequency trends," "insights" — never "prediction," "guaranteed," or "winning strategy"
+- Keep disclaimer on every recommendation page
 
 ---
 
@@ -442,15 +427,17 @@ Verified against 3+ independent sources: official lottery websites (powerball.co
 | 6 | $1.586B | Powerball | Jan 2016 | CA, FL, TN | CORRECT |
 | 7 | $1.537B | Mega Millions | Oct 2018 | SC | CORRECT |
 
-All corrections have been applied to the codebase (`src/lib/lotteries/config.ts`, `src/lib/blog.ts`).
+**Next scheduled fact-check:** May 2026 (quarterly)
 
 ---
 
 ## Key Design Decisions
 
-1. **Static export** (`output: 'export'`) — Enables free Vercel hosting, maximum CDN performance, zero serverless costs
+1. **Hybrid rendering** — Static pages for all content + serverless `/api/contact` for email. Enables free Vercel hosting with maximum CDN performance
 2. **JSON data files** — No database needed; data updated via git commits from GitHub Actions
 3. **Client-side number generator** — Uses `crypto.getRandomValues()` for true randomness, zero server load
-4. **Blog as TypeScript module** — `src/lib/blog.ts` stores posts as objects; simpler than MDX for Phase 1, easy to migrate later
+4. **Blog as TypeScript module + auto-generated JSON** — `src/lib/blog.ts` for seed posts, `content/blog/` for daily auto-generated posts
 5. **AdSense-ready but not active** — All legal pages present, `AdUnit` component renders only when env var is set
-6. **"AI-Powered" branding** — Refers to the statistical analysis algorithms, not LLM usage; legitimate and no ongoing cost
+6. **"AI-Powered" branding** — Refers to the statistical analysis algorithms; legitimate and distinctive positioning
+7. **Resend for email** — Free tier sufficient for contact form volume; auto-reply builds trust
+8. **Porkbun for domain** — Consistent pricing, no renewal markup, free WHOIS privacy
