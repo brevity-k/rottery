@@ -78,7 +78,10 @@ Respond with ONLY the HTML content string (no markdown fences, no explanation). 
     { maxAttempts: 2, baseDelayMs: 3000, label: 'Claude methodology generation' }
   );
 
-  const htmlContent = message.content[0].type === 'text' ? message.content[0].text : '';
+  let htmlContent = message.content[0].type === 'text' ? message.content[0].text : '';
+
+  // Strip markdown fences if Claude wrapped the response
+  htmlContent = htmlContent.replace(/^```html?\n?/i, '').replace(/\n?```$/i, '').trim();
 
   if (!htmlContent.includes('<h2')) {
     console.error('Generated content does not look like HTML:', htmlContent.slice(0, 200));
