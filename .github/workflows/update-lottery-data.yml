@@ -136,8 +136,8 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add src/data/ content/blog/ CLAUDE.md
-          git pull --rebase origin main
           git commit -m "chore: update lottery data & blog $(date -u +%Y-%m-%d)"
+          git pull --rebase origin main
           git push
 
       - name: Propagate blog generation failure

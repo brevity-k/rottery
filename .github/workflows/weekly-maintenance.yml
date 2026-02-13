@@ -258,8 +258,8 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add src/data/state-tax-rates.ts CLAUDE.md
-          git pull --rebase origin main
           git commit -m "chore: quarterly tax rate update $(date -u +%Y-%m-%d)"
+          git pull --rebase origin main
           git push
 
       - name: Notify on failure
@@ -355,8 +355,8 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add src/lib/states/config.ts CLAUDE.md
-          git pull --rebase origin main
           git commit -m "chore: quarterly state config refresh $(date -u +%Y-%m-%d)"
+          git pull --rebase origin main
           git push
 
       - name: Notify on failure

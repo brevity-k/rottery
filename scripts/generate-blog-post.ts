@@ -233,6 +233,71 @@ Total draws in database: ${data.draws.length}`;
 }
 
 // ---------------------------------------------------------------------------
+// JSON parsing with sanitization (handles malformed Claude output)
+// ---------------------------------------------------------------------------
+
+function parseBlogJson(text: string): BlogPost {
+  // 1. Try direct parse
+  try {
+    return JSON.parse(text);
+  } catch { /* fall through */ }
+
+  // 2. Strip markdown fences and try again
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fenced) {
+    try {
+      return JSON.parse(fenced[1].trim());
+    } catch { /* fall through */ }
+  }
+
+  // 3. Extract the outermost JSON object
+  const braceMatch = text.match(/\{[\s\S]*\}/);
+  if (!braceMatch) {
+    throw new Error(`No JSON object found in response: ${text.slice(0, 200)}`);
+  }
+  const raw = braceMatch[0];
+
+  try {
+    return JSON.parse(raw);
+  } catch { /* fall through */ }
+
+  // 4. Attempt to repair: extract fields individually
+  // Claude commonly produces unescaped quotes inside the HTML content field
+  const extractField = (name: string): string => {
+    const re = new RegExp(`"${name}"\\s*:\\s*"`, 'g');
+    const m = re.exec(raw);
+    if (!m) return '';
+    const start = re.lastIndex;
+    // Walk forward to find the closing " that's followed by , or }
+    let i = start;
+    while (i < raw.length) {
+      if (raw[i] === '\\') { i += 2; continue; }
+      if (raw[i] === '"') {
+        // Check if this quote is followed by optional whitespace + , or }
+        const rest = raw.slice(i + 1).trimStart();
+        if (rest.startsWith(',') || rest.startsWith('}')) {
+          return raw.slice(start, i);
+        }
+      }
+      i++;
+    }
+    return raw.slice(start);
+  };
+
+  const slug = extractField('slug');
+  const title = extractField('title');
+  const description = extractField('description');
+  const category = extractField('category');
+  const content = extractField('content');
+
+  if (!slug || !title || !content) {
+    throw new Error(`Failed to parse blog JSON after all attempts: ${raw.slice(0, 300)}`);
+  }
+
+  return { slug, title, description, category, content, date: '' };
+}
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
@@ -322,35 +387,25 @@ Respond with ONLY valid JSON (no markdown fences, no explanation) in this exact 
   console.log(`Generating blog post for ${today} (topic: ${topic})...`);
 
   const client = new Anthropic();
-  const message = await withRetry(
-    () => client.messages.create({
-      model: CLAUDE_MODEL,
-      max_tokens: 2048,
-      messages: [{ role: 'user', content: prompt }],
-    }),
-    { ...RETRY_PRESETS.CLAUDE_API, label: 'Claude blog generation' }
+
+  // Wrap API call + JSON parsing together in retry so malformed JSON triggers a retry
+  const post = await withRetry(
+    async () => {
+      const message = await client.messages.create({
+        model: CLAUDE_MODEL,
+        max_tokens: 2048,
+        messages: [{ role: 'user', content: prompt }],
+      });
+
+      const textBlock = message.content.find(b => b.type === 'text');
+      if (!textBlock || textBlock.type !== 'text') {
+        throw new Error('Claude response contains no text block');
+      }
+
+      return parseBlogJson(textBlock.text);
+    },
+    { ...RETRY_PRESETS.CLAUDE_API, maxAttempts: 3, label: 'Claude blog generation + parse' }
   );
-
-  const textBlock = message.content.find(b => b.type === 'text');
-  if (!textBlock || textBlock.type !== 'text') {
-    console.error('Claude response contains no text block');
-    process.exit(1);
-  }
-  const text = textBlock.text;
-
-  let post: BlogPost;
-  try {
-    post = JSON.parse(text);
-  } catch {
-    // Try extracting JSON from possible markdown fences
-    const match = text.match(/\{[\s\S]*\}/);
-    if (match) {
-      post = JSON.parse(match[0]);
-    } else {
-      console.error('Failed to parse response as JSON:', text.slice(0, 200));
-      process.exit(1);
-    }
-  }
 
   // Validate required fields
   const requiredFields = ['slug', 'title', 'description', 'category', 'content'] as const;
