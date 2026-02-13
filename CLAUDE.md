@@ -10,7 +10,7 @@ My Lotto Stats is a free, SEO-optimized lottery information website that provide
 **Hosting:** Vercel (auto-deploys on push)
 **Google Analytics:** G-5TW1TM399X
 **Google Search Console:** Verified + sitemap submitted
-**Current page count:** 599 static pages + 1 serverless API route
+**Current page count:** 600 static pages + 1 serverless API route
 
 ---
 
@@ -112,11 +112,11 @@ rottery/
 │   │   ├── blog.ts    Static blog post content + getters
 │   │   └── utils/     formatters.ts, constants.ts
 │   └── data/
-│       ├── powerball.json           # ~1,900 draws (2010 to present)
+│       ├── powerball.json           # ~1,901 draws (2010 to present)
 │       ├── mega-millions.json       # ~2,475 draws (2002 to present)
-│       ├── cash4life.json           # ~2,938 draws (2014 to present)
-│       ├── ny-lotto.json            # ~2,547 draws (2001 to present)
-│       ├── take5.json               # ~12,174 draws (2001 to present, 2x/day)
+│       ├── cash4life.json           # ~2,940 draws (2014 to present)
+│       ├── ny-lotto.json            # ~2,548 draws (2001 to present)
+│       ├── take5.json               # ~12,178 draws (2001 to present, 2x/day)
 │       └── state-tax-rates.ts       # All 50 states + DC tax data (auto-updated quarterly)
 ├── scripts/
 │   ├── lib/
