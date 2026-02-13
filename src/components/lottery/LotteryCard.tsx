@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { LotteryConfig, DrawResult } from '@/lib/lotteries/types';
 import LotteryBall from './LotteryBall';
 import { formatDate } from '@/lib/utils/formatters';
+import DrawCountdown from './DrawCountdown';
 
 interface LotteryCardProps {
   lottery: LotteryConfig;
@@ -16,9 +17,12 @@ export default function LotteryCard({ lottery, latestDraw }: LotteryCardProps) {
           <h2 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
             {lottery.name}
           </h2>
-          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-            {lottery.drawDays.join(', ')}
-          </span>
+          <DrawCountdown
+            drawDays={lottery.drawDays}
+            drawTime={lottery.drawTime}
+            retiredDate={lottery.retiredDate}
+            variant="compact"
+          />
         </div>
 
         {latestDraw && (

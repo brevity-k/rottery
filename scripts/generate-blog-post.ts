@@ -13,7 +13,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import fs from 'fs';
 import path from 'path';
 import { withRetry } from './lib/retry';
-import { CLAUDE_MODEL, SEASONAL_OVERRIDES, SPECIAL_TOPICS, TARGET_KEYWORDS, BLOG_FORBIDDEN_TERMS, BLOG_MIN_WORDS, KNOWN_DATASETS, isGameRetired, RETRY_PRESETS } from './lib/constants';
+import { CLAUDE_MODEL, SEASONAL_OVERRIDES, SPECIAL_TOPICS, TOPICS, TARGET_KEYWORDS, BLOG_FORBIDDEN_TERMS, BLOG_MIN_WORDS, KNOWN_DATASETS, isGameRetired, RETRY_PRESETS } from './lib/constants';
 
 // ---------------------------------------------------------------------------
 // Types (self-contained – no @/ imports so tsx can run standalone)
@@ -164,24 +164,7 @@ function getExistingTitles(): string[] {
 // Topic rotation (14 topics, cycling through all games)
 // ---------------------------------------------------------------------------
 
-const TOPICS = [
-  'Recap and analysis of the latest Powerball draw results',
-  'Weekly hot and cold number trends across all five lottery games',
-  'Mega Millions draw analysis and statistical trends',
-  'Cash4Life daily game spotlight: patterns and strategies',
-  'Deep dive into overdue numbers across all games that are statistically due',
-  'Number pair spotlight: which combinations appear together most often',
-  'Mega Millions draw recap and weekend lottery outlook',
-  'NY Lotto analysis: frequency trends and number insights',
-  'Take 5 midday vs evening draw comparison and patterns',
-  'Lottery tax analysis: which states give you the best net payout',
-  'Multi-game comparison: Powerball vs Mega Millions vs Cash4Life odds',
-  'Statistical anomalies and interesting patterns in recent draws',
-  'State lottery spotlight: best states for lottery winners in terms of taxes',
-  'Lump sum vs annuity: what the numbers actually show for current jackpots',
-] as const;
-
-// Validate that TOPICS and TARGET_KEYWORDS stay in sync
+// Validate that TOPICS and TARGET_KEYWORDS stay in sync (both from constants.ts)
 if (TOPICS.length !== TARGET_KEYWORDS.length) {
   throw new Error(
     `TOPICS (${TOPICS.length}) and TARGET_KEYWORDS (${TARGET_KEYWORDS.length}) must have the same length. ` +

@@ -10,6 +10,7 @@ import { getRelatedPosts } from '@/lib/blog-links';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import ResultsTable from '@/components/lottery/ResultsTable';
 import JsonLd from '@/components/seo/JsonLd';
+import DrawCountdown from '@/components/lottery/DrawCountdown';
 import Card from '@/components/ui/Card';
 
 export function generateStaticParams() {
@@ -69,6 +70,12 @@ export default async function LotteryPage({ params }: { params: Promise<{ lotter
             {formatLastUpdated(lastUpdated)} · <a href={lottery.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Verify with {lottery.name} ↗</a>
           </p>
         )}
+        <DrawCountdown
+          drawDays={lottery.drawDays}
+          drawTime={lottery.drawTime}
+          retiredDate={lottery.retiredDate}
+          variant="hero"
+        />
         <p className="text-lg text-gray-600 mb-8 max-w-3xl">{lottery.description}</p>
 
         {/* Quick Links */}

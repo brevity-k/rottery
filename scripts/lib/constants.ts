@@ -70,7 +70,25 @@ export const SPECIAL_TOPICS: Record<string, string> = {
   '2026-02': 'Cash4Life retirement on February 21 — what it means for players and what comes next',
 };
 
-/** SEO target keywords to weave into blog posts, rotated alongside topics. */
+/** Blog topic rotation — 14 topics cycling daily, paired 1:1 with TARGET_KEYWORDS. */
+export const TOPICS: string[] = [
+  'Recap and analysis of the latest Powerball draw results',
+  'Weekly hot and cold number trends across all five lottery games',
+  'Mega Millions draw analysis and statistical trends',
+  'Cash4Life daily game spotlight: patterns and strategies',
+  'Deep dive into overdue numbers across all games that are statistically due',
+  'Number pair spotlight: which combinations appear together most often',
+  'Mega Millions draw recap and weekend lottery outlook',
+  'NY Lotto analysis: frequency trends and number insights',
+  'Take 5 midday vs evening draw comparison and patterns',
+  'Lottery tax analysis: which states give you the best net payout',
+  'Multi-game comparison: Powerball vs Mega Millions vs Cash4Life odds',
+  'Statistical anomalies and interesting patterns in recent draws',
+  'State lottery spotlight: best states for lottery winners in terms of taxes',
+  'Lump sum vs annuity: what the numbers actually show for current jackpots',
+];
+
+/** SEO target keywords to weave into blog posts, rotated alongside TOPICS. */
 export const TARGET_KEYWORDS: string[] = [
   'most common powerball numbers',
   'mega millions winning numbers analysis',
