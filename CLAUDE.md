@@ -10,7 +10,7 @@ My Lotto Stats is a free, SEO-optimized lottery information website that provide
 **Hosting:** Vercel (auto-deploys on push)
 **Google Analytics:** G-5TW1TM399X
 **Google Search Console:** Verified + sitemap submitted
-**Current page count:** 600 static pages + 1 serverless API route
+**Current page count:** 601 static pages + 1 serverless API route
 
 ---
 
