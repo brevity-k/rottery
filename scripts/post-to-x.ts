@@ -35,13 +35,18 @@ interface BlogPost {
   date: string;
 }
 
+function extractDateSuffix(filename: string): string {
+  // Filenames end with YYYY-MM-DD.json — extract the date for sorting
+  const match = filename.match(/(\d{4}-\d{2}-\d{2})\.json$/);
+  return match ? match[1] : '';
+}
+
 function getLatestBlogPost(): BlogPost | null {
   if (!fs.existsSync(BLOG_DIR)) return null;
 
   const files = fs.readdirSync(BLOG_DIR)
     .filter(f => f.endsWith('.json'))
-    .sort()
-    .reverse();
+    .sort((a, b) => extractDateSuffix(b).localeCompare(extractDateSuffix(a)));
 
   if (files.length === 0) return null;
 
