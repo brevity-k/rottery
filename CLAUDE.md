@@ -143,6 +143,7 @@ rottery/
 │   ├── post-to-x.yml               # Triggered after blog generation (X/Twitter posting)
 │   └── weekly-maintenance.yml       # Weekly: new datasets check, quarterly: tax rate update
 ├── content/blog/                    # Auto-generated daily blog posts (JSON)
+├── .posted-to-x                     # Tracks blog slugs already posted to X (committed, auto-updated)
 ├── public/
 │   └── ads.txt                      # AdSense placeholder
 └── .env.local                       # RESEND_API_KEY (not committed)
@@ -226,10 +227,12 @@ The site is designed to run itself with minimal manual intervention.
 
 ### Daily Automation — Post to X (after blog generation, `post-to-x.yml`)
 1. Triggered automatically after Generate Blog Post workflow completes
-2. Reads the most recent blog post JSON from `content/blog/`
-3. Crafts tweet: emoji + title + description + URL + hashtags (≤280 chars)
-4. Posts via X API v2 (OAuth 1.0a, with retry)
-5. Logs tweet URL on success
+2. Reads the most recent blog post JSON from `content/blog/` (sorted by date suffix)
+3. Checks `.posted-to-x` tracker file — skips if slug already posted (prevents duplicates)
+4. Crafts tweet: emoji + title + description + URL + hashtags (≤280 chars)
+5. Posts via X API v2 (OAuth 1.0a, with retry)
+6. Appends slug to `.posted-to-x` and commits the tracker file
+7. Logs tweet URL on success
 
 ### Weekly Automation (Monday 8 AM UTC)
 - Scan `data.ny.gov` SODA catalog for new lottery-related datasets (12 search terms, with retry)
@@ -286,6 +289,7 @@ All GitHub Actions workflows create Issues on failure:
 - Stale data detection alerts before data goes too stale
 - Retry logic prevents transient API failures from breaking the pipeline
 - All failure notifications are deduplicated to prevent issue spam
+- X posting tracks posted slugs in `.posted-to-x` to prevent duplicate tweets
 
 ---
 
