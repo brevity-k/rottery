@@ -50,6 +50,8 @@ export const RETRY_PRESETS = {
   CLAUDE_API: { maxAttempts: 2, baseDelayMs: 3000 } satisfies RetryOptions,
   /** GitHub API calls: 2 attempts with moderate delay. */
   GITHUB_API: { maxAttempts: 2, baseDelayMs: 2000 } satisfies RetryOptions,
+  /** X API calls: 2 attempts with moderate delay for rate limits. */
+  X_API: { maxAttempts: 2, baseDelayMs: 2000 } satisfies RetryOptions,
 } as const;
 
 // ---------------------------------------------------------------------------

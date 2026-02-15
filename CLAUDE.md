@@ -22,6 +22,7 @@ My Lotto Stats is a free, SEO-optimized lottery information website that provide
 [Runtime]     Serverless: /api/contact (Resend email)
 [Daily Cron]  GitHub Action 1: fetches 5 lottery datasets ──> git push ──> Vercel rebuild
 [Daily Cron]  GitHub Action 2: generates blog (triggered after data fetch) ──> git push ──> Vercel rebuild
+[Daily Cron]  GitHub Action 3: posts latest blog to X/Twitter (triggered after blog generation)
 [Weekly Cron] GitHub Action checks for new SODA datasets ──> creates GitHub Issue if found
 [Quarterly]   GitHub Action auto-updates state tax rates via Claude API
 ```
@@ -37,6 +38,7 @@ My Lotto Stats is a free, SEO-optimized lottery information website that provide
 | Data storage | JSON files in `src/data/` |
 | State tax data | TypeScript file in `src/data/state-tax-rates.ts` |
 | Blog generation | Claude Haiku via Anthropic API (daily, automated, 14-topic rotation) |
+| Social posting | twitter-api-v2 (daily auto-post to X after blog generation) |
 | Hosting | Vercel free tier |
 | DNS | Porkbun → Vercel (A: 76.76.21.21, CNAME: cname.vercel-dns.com) |
 
@@ -130,6 +132,7 @@ rottery/
 │   ├── validate-build.ts            # Post-build validation (draw counts, page count, blog integrity)
 │   ├── seo-health-check.ts          # Weekly SEO check (page count, data freshness, blog quality)
 │   ├── cleanup-stale-issues.ts      # Auto-close resolved automation-failure GitHub Issues
+│   ├── post-to-x.ts                 # Post latest blog to X/Twitter (daily, automated)
 │   ├── onboard-new-game.ts          # Semi-automated new lottery game onboarding via Claude API
 │   ├── generate-state-configs.ts    # Generate/update state hub configs via Claude API (quarterly)
 │   ├── generate-methodology.ts      # One-time methodology page content generation
@@ -137,6 +140,7 @@ rottery/
 ├── .github/workflows/
 │   ├── fetch-lottery-data.yml       # Daily cron at 6 AM UTC (data fetch + stale check)
 │   ├── generate-blog.yml            # Triggered after data fetch (blog generation)
+│   ├── post-to-x.yml               # Triggered after blog generation (X/Twitter posting)
 │   └── weekly-maintenance.yml       # Weekly: new datasets check, quarterly: tax rate update
 ├── content/blog/                    # Auto-generated daily blog posts (JSON)
 ├── public/
@@ -157,6 +161,7 @@ npm run start                  # Serve production build
 # Data updates (daily automation)
 npx tsx scripts/update-data.ts              # Fetch all 5 games from SODA API + validate
 npx tsx scripts/generate-blog-post.ts       # Generate daily blog post (needs ANTHROPIC_API_KEY)
+npx tsx scripts/post-to-x.ts               # Post latest blog to X (needs X API keys)
 
 # Monitoring (weekly automation)
 npx tsx scripts/check-new-datasets.ts       # Check for new SODA lottery datasets
@@ -187,6 +192,11 @@ npm run lint                   # ESLint check
 |---|---|---|---|
 | `RESEND_API_KEY` | Yes | Vercel + `.env.local` | Resend API key for contact form emails |
 | `ANTHROPIC_API_KEY` | No | GitHub Secrets | For auto blog generation + tax rate updates |
+| `CONTACT_EMAIL` | No | Vercel | Contact form recipient (default: rottery0.kr@gmail.com) |
+| `X_CONSUMER_KEY` | No | GitHub Secrets + `.env.local` | X API consumer key (OAuth 1.0a) |
+| `X_SECRET_KEY` | No | GitHub Secrets + `.env.local` | X API consumer secret |
+| `X_API_ACCESS_TOKEN` | No | GitHub Secrets + `.env.local` | X API access token |
+| `X_API_ACCESS_TOKEN_SECRET` | No | GitHub Secrets + `.env.local` | X API access token secret |
 | `NEXT_PUBLIC_ADSENSE_CLIENT_ID` | No (Phase 2) | Vercel | Google AdSense publisher ID |
 | `GITHUB_TOKEN` | Auto | GitHub Actions | Used by check-new-datasets.ts to create issues |
 
@@ -213,6 +223,13 @@ The site is designed to run itself with minimal manual intervention.
 3. Build verification before commit (`npm run build && validate-build.ts`)
 4. Sync CLAUDE.md stats (page count, draw counts)
 5. Auto-commit blog + push → Vercel auto-deploys
+
+### Daily Automation — Post to X (after blog generation, `post-to-x.yml`)
+1. Triggered automatically after Generate Blog Post workflow completes
+2. Reads the most recent blog post JSON from `content/blog/`
+3. Crafts tweet: emoji + title + description + URL + hashtags (≤280 chars)
+4. Posts via X API v2 (OAuth 1.0a, with retry)
+5. Logs tweet URL on success
 
 ### Weekly Automation (Monday 8 AM UTC)
 - Scan `data.ny.gov` SODA catalog for new lottery-related datasets (12 search terms, with retry)
@@ -248,13 +265,14 @@ All external API calls use `withRetry()` with exponential backoff:
 - **Claude API calls:** 2 attempts, 3s base delay
 - **SODA catalog searches:** 2 attempts, 1s base delay
 - **GitHub API calls:** 2 attempts, 2s base delay (issue search, create, comment, workflow runs)
+- **X API calls:** 2 attempts, 2s base delay
 
 ### Failure Notifications
 All GitHub Actions workflows create Issues on failure:
 - **Label:** `automation-failure` — used for deduplication (comment on existing open issue instead of creating duplicates)
 - **Stale data:** Separate `[Auto] Stale lottery data detected` issue with warning details
 - **Blog failures:** `[Auto] generate-blog failed` — separate workflow, easy to identify
-- **Workflow failures:** `[Auto] fetch-lottery-data failed`, `[Auto] generate-blog failed`, `[Auto] check-new-datasets failed`, `[Auto] quarterly-tax-update failed`, `[Auto] quarterly-state-refresh failed`
+- **Workflow failures:** `[Auto] fetch-lottery-data failed`, `[Auto] generate-blog failed`, `[Auto] post-to-x failed`, `[Auto] check-new-datasets failed`, `[Auto] quarterly-tax-update failed`, `[Auto] quarterly-state-refresh failed`
 - **SEO failures:** `[Auto] SEO health check failed` (label: `seo-health`)
 - **Security:** `[Auto] npm security vulnerabilities detected`
 - **Auto-close:** `cleanup-stale-issues.ts` closes issues when corresponding workflow succeeds
@@ -564,7 +582,7 @@ Two separate GitHub Actions workflows run daily:
 - **API route:** `src/app/api/contact/route.ts` (serverless on Vercel)
 - **Email service:** Resend (`RESEND_API_KEY` in Vercel env vars + `.env.local`)
 - **From address:** `My Lotto Stats <onboarding@resend.dev>`
-- **Owner email:** `brevity1s.wos@gmail.com`
+- **Owner email:** `rottery0.kr@gmail.com`
 - **Flow:** User submits form → owner gets notification email → sender gets auto-reply confirmation
 - **Env var:** `RESEND_API_KEY` must be set in Vercel project settings for production
 

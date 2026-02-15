@@ -17,6 +17,8 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
+  const contactEmail = process.env.CONTACT_EMAIL || 'rottery0.kr@gmail.com';
+
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -38,8 +40,8 @@ export default function ContactPage() {
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>
             You can also reach us directly at{' '}
-            <a href="mailto:brevity1s.wos@gmail.com" className="text-blue-600 hover:underline">
-              brevity1s.wos@gmail.com
+            <a href={`mailto:${contactEmail}`} className="text-blue-600 hover:underline">
+              {contactEmail}
             </a>
           </p>
         </div>
