@@ -8,6 +8,7 @@
  * Skips gracefully if:
  *   - Required env vars are not set
  *   - No blog posts exist in content/blog/
+ *   - Latest blog post was already posted (tracked in .posted-to-x)
  */
 
 import fs from 'fs';
@@ -22,6 +23,7 @@ import { RETRY_PRESETS } from './lib/constants';
 
 const SITE_URL = 'https://mylottostats.com';
 const BLOG_DIR = path.join(process.cwd(), 'content', 'blog');
+const POSTED_FILE = path.join(process.cwd(), '.posted-to-x');
 const MAX_TWEET_LENGTH = 280;
 
 // ---------------------------------------------------------------------------
@@ -80,6 +82,17 @@ function buildTweet(post: BlogPost): string {
   return withoutDesc;
 }
 
+function getPostedSlugs(): Set<string> {
+  if (!fs.existsSync(POSTED_FILE)) return new Set();
+  return new Set(
+    fs.readFileSync(POSTED_FILE, 'utf-8').split('\n').filter(Boolean)
+  );
+}
+
+function markAsPosted(slug: string): void {
+  fs.appendFileSync(POSTED_FILE, slug + '\n');
+}
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
@@ -108,6 +121,13 @@ async function main(): Promise<void> {
 
   console.log(`Latest blog post: "${post.title}" (${post.date})`);
 
+  // Check for duplicate
+  const posted = getPostedSlugs();
+  if (posted.has(post.slug)) {
+    console.log(`Skipping X post: already posted "${post.slug}"`);
+    return;
+  }
+
   // Build tweet
   const tweet = buildTweet(post);
   console.log(`Tweet (${tweet.length} chars):\n${tweet}\n`);
@@ -130,6 +150,7 @@ async function main(): Promise<void> {
   );
 
   const tweetId = result.data.id;
+  markAsPosted(post.slug);
   console.log(`Posted to X: https://x.com/i/status/${tweetId}`);
 }
 
