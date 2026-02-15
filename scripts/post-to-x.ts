@@ -53,28 +53,26 @@ function buildTweet(post: BlogPost): string {
   const url = `${SITE_URL}/blog/${post.slug}`;
   const hashtags = '#Lottery #LotteryStats';
   const prefix = '\u{1F4CA} '; // 📊
+  const sep = '\n\n';
 
-  // Fixed parts: prefix + newlines + url + newlines + hashtags
-  const fixedLength = prefix.length + url.length + hashtags.length + 4; // 4 newlines
-  const budgetForContent = MAX_TWEET_LENGTH - fixedLength;
-
-  // Title gets priority, description fills remaining space
+  // Title gets priority (max 70 chars)
   const title = post.title.length <= 70 ? post.title : post.title.slice(0, 67) + '...';
-  const descBudget = budgetForContent - title.length - 1; // 1 newline between title and desc
+  const headline = `${prefix}${title}`;
 
-  let description = '';
+  // Fixed parts without description: headline + sep + url + sep + hashtags
+  const withoutDesc = `${headline}${sep}${url}${sep}${hashtags}`;
+
+  // Budget remaining for description + one separator
+  const descBudget = MAX_TWEET_LENGTH - withoutDesc.length - sep.length;
+
   if (descBudget > 20 && post.description) {
-    description = post.description.length <= descBudget
+    const description = post.description.length <= descBudget
       ? post.description
       : post.description.slice(0, descBudget - 3) + '...';
+    return `${headline}${sep}${description}${sep}${url}${sep}${hashtags}`;
   }
 
-  const parts = [`${prefix}${title}`];
-  if (description) parts.push(description);
-  parts.push(url);
-  parts.push(hashtags);
-
-  return parts.join('\n\n');
+  return withoutDesc;
 }
 
 // ---------------------------------------------------------------------------
