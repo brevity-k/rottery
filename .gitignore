@@ -42,4 +42,3 @@ next-env.d.ts
 
 # automation markers
 src/data/.stale-warning
-.posted-to-x
