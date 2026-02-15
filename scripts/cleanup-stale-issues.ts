@@ -18,14 +18,14 @@ const LABEL = 'automation-failure';
 
 // Map issue title patterns to workflow filenames
 const WORKFLOW_MAP: Record<string, string> = {
-  'update-lottery-data failed': 'update-lottery-data.yml',
-  'blog generation failed': 'update-lottery-data.yml',
+  'fetch-lottery-data failed': 'fetch-lottery-data.yml',
+  'generate-blog failed': 'generate-blog.yml',
+  'Stale lottery data detected': 'fetch-lottery-data.yml',
   'check-new-datasets failed': 'weekly-maintenance.yml',
   'quarterly-tax-update failed': 'weekly-maintenance.yml',
   'quarterly-state-refresh failed': 'weekly-maintenance.yml',
   'SEO health check failed': 'weekly-maintenance.yml',
   'npm security vulnerabilities': 'weekly-maintenance.yml',
-  'Stale lottery data detected': 'update-lottery-data.yml',
 };
 
 interface GitHubIssue {

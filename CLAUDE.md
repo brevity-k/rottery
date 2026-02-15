@@ -20,7 +20,8 @@ My Lotto Stats is a free, SEO-optimized lottery information website that provide
 [Build Time]  SODA API JSON files ──> Next.js SSG ──> Static HTML ──> Vercel CDN
 [Runtime]     Client-side: number generator, tax calculator, chart interactions
 [Runtime]     Serverless: /api/contact (Resend email)
-[Daily Cron]  GitHub Action fetches 5 lottery datasets + generates blog ──> git push ──> Vercel rebuild
+[Daily Cron]  GitHub Action 1: fetches 5 lottery datasets ──> git push ──> Vercel rebuild
+[Daily Cron]  GitHub Action 2: generates blog (triggered after data fetch) ──> git push ──> Vercel rebuild
 [Weekly Cron] GitHub Action checks for new SODA datasets ──> creates GitHub Issue if found
 [Quarterly]   GitHub Action auto-updates state tax rates via Claude API
 ```
@@ -134,7 +135,8 @@ rottery/
 │   ├── generate-methodology.ts      # One-time methodology page content generation
 │   └── sync-claude-md.ts            # Sync CLAUDE.md stats (page count, draw counts) after builds
 ├── .github/workflows/
-│   ├── update-lottery-data.yml      # Daily cron at 6 AM UTC (data + blog)
+│   ├── fetch-lottery-data.yml       # Daily cron at 6 AM UTC (data fetch + stale check)
+│   ├── generate-blog.yml            # Triggered after data fetch (blog generation)
 │   └── weekly-maintenance.yml       # Weekly: new datasets check, quarterly: tax rate update
 ├── content/blog/                    # Auto-generated daily blog posts (JSON)
 ├── public/
@@ -194,18 +196,23 @@ npm run lint                   # ESLint check
 
 The site is designed to run itself with minimal manual intervention.
 
-### Daily Automation (6 AM UTC)
+### Daily Automation — Fetch Lottery Data (6 AM UTC, `fetch-lottery-data.yml`)
 1. Fetch all 5 lottery datasets from SODA API (with retry: 3 attempts, exponential backoff)
 2. Validate data: range checks, schedule validation, duplicate detection, record count guard
 3. Check for stale data: per-game staleness thresholds (PB/MM: 4 days, C4L/T5: 3 days, NYL: 5 days)
-4. Generate blog post via Claude Haiku (14-topic rotation covering active games + tax/state topics, with retry)
+4. Build verification before commit (`npm run build && validate-build.ts`)
+5. Sync CLAUDE.md stats (page count, draw counts)
+6. Auto-commit data + push → Vercel auto-deploys
+7. On stale data: writes `.stale-warning` marker → workflow creates GitHub Issue
+
+### Daily Automation — Generate Blog (after data fetch, `generate-blog.yml`)
+1. Triggered automatically after Fetch Lottery Data workflow completes
+2. Generate blog post via Claude Haiku (14-topic rotation covering active games + tax/state topics, with retry)
    - Retired games (e.g., Cash4Life after 2026-02-21) are automatically excluded from analysis
    - TOPICS and TARGET_KEYWORDS arrays validated at startup for length parity
-5. Build verification before commit (`npm run build && validate-build.ts`)
-6. Sync CLAUDE.md stats (page count, draw counts)
-7. Auto-commit + push → Vercel auto-deploys
-8. On blog failure: data still commits, but workflow reports failure + creates GitHub Issue
-9. On stale data: writes `.stale-warning` marker → workflow creates GitHub Issue
+3. Build verification before commit (`npm run build && validate-build.ts`)
+4. Sync CLAUDE.md stats (page count, draw counts)
+5. Auto-commit blog + push → Vercel auto-deploys
 
 ### Weekly Automation (Monday 8 AM UTC)
 - Scan `data.ny.gov` SODA catalog for new lottery-related datasets (12 search terms, with retry)
@@ -246,8 +253,8 @@ All external API calls use `withRetry()` with exponential backoff:
 All GitHub Actions workflows create Issues on failure:
 - **Label:** `automation-failure` — used for deduplication (comment on existing open issue instead of creating duplicates)
 - **Stale data:** Separate `[Auto] Stale lottery data detected` issue with warning details
-- **Blog failures:** `[Auto] blog generation failed` — data still commits, workflow shows failed
-- **Workflow failures:** `[Auto] update-lottery-data failed`, `[Auto] check-new-datasets failed`, `[Auto] quarterly-tax-update failed`, `[Auto] quarterly-state-refresh failed`
+- **Blog failures:** `[Auto] generate-blog failed` — separate workflow, easy to identify
+- **Workflow failures:** `[Auto] fetch-lottery-data failed`, `[Auto] generate-blog failed`, `[Auto] check-new-datasets failed`, `[Auto] quarterly-tax-update failed`, `[Auto] quarterly-state-refresh failed`
 - **SEO failures:** `[Auto] SEO health check failed` (label: `seo-health`)
 - **Security:** `[Auto] npm security vulnerabilities detected`
 - **Auto-close:** `cleanup-stale-issues.ts` closes issues when corresponding workflow succeeds
@@ -485,17 +492,21 @@ Lottery game formats change every 3-8 years. The April 2025 Mega Millions overha
 
 ## Daily Data Update Flow
 
-The GitHub Actions workflow runs daily at 6 AM UTC:
+Two separate GitHub Actions workflows run daily:
 
+### Workflow 1: Fetch Lottery Data (`fetch-lottery-data.yml`, 6 AM UTC)
 1. Checkout repo → Install dependencies
 2. Fetch all 5 lottery datasets from SODA API with validation (retry on failure)
 3. Check for stale data → write `.stale-warning` if any game exceeds threshold
-4. Generate daily blog post via Claude Haiku (14-topic rotation, all 5 games, retry on failure)
-5. If stale data detected → create/update GitHub Issue
-6. Check if data/blog files changed
-7. If changed: verify build succeeds → commit + push → Vercel auto-deploys
-8. On any step failure → create/update GitHub Issue with `automation-failure` label
-9. All 585+ static pages regenerated with fresh data
+4. If stale data detected → create/update GitHub Issue
+5. If data changed: verify build succeeds → commit data + push → Vercel auto-deploys
+6. On failure → create/update GitHub Issue with `automation-failure` label
+
+### Workflow 2: Generate Blog (`generate-blog.yml`, triggered after Workflow 1)
+1. Triggered automatically when Fetch Lottery Data workflow completes
+2. Generate daily blog post via Claude Haiku (14-topic rotation, all 5 games, retry on failure)
+3. If blog changed: verify build succeeds → commit blog + push → Vercel auto-deploys
+4. On failure → create/update GitHub Issue with `automation-failure` label
 
 **Cost: $0** (GitHub Actions free for public repos, Vercel rebuilds free, SODA API free)
 
