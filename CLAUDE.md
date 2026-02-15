@@ -151,7 +151,7 @@ rottery/
 ```bash
 # Development
 npm run dev                    # Start dev server (http://localhost:3000)
-npm run build                  # Build for production (~617 pages)
+npm run build                  # Build for production (~600 pages)
 npm run start                  # Serve production build
 
 # Data updates (daily automation)

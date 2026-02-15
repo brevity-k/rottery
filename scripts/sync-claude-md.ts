@@ -108,16 +108,6 @@ function main() {
   const pageEstimate = estimatePageCount();
 
   const replacements: Replacement[] = [
-    {
-      pattern: /\| Powerball \|.*?\| ~[\d,]+ draws/,
-      replacement: `| Powerball | \`powerball\` | 5/69 + 1/26 | Powerball | Mon, Wed, Sat 10:59 PM ET | \`d6yy-54nr\` | ~${pbDraws.toLocaleString()} draws`,
-      label: 'Powerball draw count',
-    },
-    {
-      pattern: /\| Mega Millions \|.*?\| ~[\d,]+ draws/,
-      replacement: `| Mega Millions | \`mega-millions\` | 5/70 + 1/24 | Mega Ball | Tue, Fri 11:00 PM ET | \`5xaw-6ayf\` | ~${mmDraws.toLocaleString()} draws`,
-      label: 'Mega Millions draw count',
-    },
     // Update draw counts in project structure section
     {
       pattern: /powerball\.json\s+#\s*~[\d,]+ draws/,
@@ -144,11 +134,11 @@ function main() {
       replacement: `take5.json               # ~${t5Draws.toLocaleString()} draws`,
       label: 'Take 5 JSON comment',
     },
-    // Update state count references
+    // Update build comment page count
     {
-      pattern: /\b(\d+) states\b/g,
-      replacement: `${stateCount} states`,
-      label: 'State count',
+      pattern: /npm run build\s+# Build for production \(~\d+ pages\)/,
+      replacement: `npm run build                  # Build for production (~${pageEstimate} pages)`,
+      label: 'Build comment page count',
     },
   ];
 
@@ -156,11 +146,6 @@ function main() {
   let changes = 0;
   let warnings = 0;
   for (const r of replacements) {
-    if (r.pattern.global) {
-      // For global patterns, only replace in specific contexts
-      // Skip the state count global replacement — too risky to replace all occurrences
-      continue;
-    }
     if (!r.pattern.test(content)) {
       console.warn(`  ⚠ Pattern not found: ${r.label} — CLAUDE.md format may have changed`);
       warnings++;
