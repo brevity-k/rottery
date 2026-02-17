@@ -30,6 +30,35 @@ export const DATASET_ID_TO_GAME: Record<string, string> = Object.fromEntries(
   Object.values(KNOWN_DATASETS).map(d => [d.datasetId, d.name])
 );
 
+/**
+ * Dataset IDs reviewed and confirmed NOT to be lottery draw games.
+ * These are permanently ignored by check-new-datasets.ts to prevent false positives.
+ *
+ * When the scanner flags a new dataset that turns out to be non-game data (retailers,
+ * sales reports, education funding, etc.), add its ID here to suppress future alerts.
+ */
+export const IGNORED_DATASET_IDS = new Set([
+  '2vvn-pdyi', // NYS Lottery Retailers
+  't8pe-c66p', // NYS Lottery Retailers Map
+  'xyvi-fbb9', // Lottery Daily Retailer Sales
+  'wyec-3ji4', // Lottery Annual Retailer Sales
+  '9ypc-vjiq', // Lottery Aid to Education
+  'g6gf-cj67', // Lottery Aid to Education Total
+  '4yih-vkdm', // Lottery Aid to Education by County
+  'xbdb-nzds', // OTDA LIM Lottery Intercept Match
+  'xjtd-9p3n', // Sweet Million (Retired 2014)
+  'rbnu-dzp6', // Lottery Raffle (one-time Oct 2025)
+  '6j6c-aqy9', // NYSDOT Highway Record Plans
+  '6bx3-2s36', // Compact NYSDOT Highway Record Plans
+  '73iw-kuxv', // Personal Income Tax Filers 1
+  'f3t7-zvbx', // Personal Income Tax Filers 2
+  'rt8x-r6c8', // Personal Income Tax Filers 3
+  'qjqv-zrwt', // Personal Income Tax Filers 4
+  'tw9e-7nms', // NYS Thruway Origin and Destination
+  '94fv-bak7', // MTA Subway Elevator and Escalator
+  '84qh-f5nv', // NYS Corporate Tax Credits
+]);
+
 /** Check if a game is retired as of the given date. */
 export function isGameRetired(gameKey: string, asOf: Date = new Date()): boolean {
   const game = KNOWN_DATASETS[gameKey];

@@ -60,6 +60,11 @@ My Lotto Stats is a free, SEO-optimized lottery information website that provide
 - Cash4Life is **retiring Feb 21, 2026**. Historical data remains valuable.
 - **Millionaire for Life** launches Feb 22, 2026 replacing Cash4Life + Lucky for Life. SODA endpoint expected soon — the weekly `check-new-datasets.ts` script will auto-detect it.
 
+**Known untracked draw games on SODA** (candidates for Phase 3):
+- Daily Numbers / Win-4 — daily pick-3/pick-4 style games
+- Quick Draw — keno-style game with frequent draws
+- Pick 10 — pick-10 style game
+
 ---
 
 ## Project Structure
@@ -236,7 +241,9 @@ The site is designed to run itself with minimal manual intervention.
 
 ### Weekly Automation (Monday 8 AM UTC)
 - Scan `data.ny.gov` SODA catalog for new lottery-related datasets (12 search terms, with retry)
-- Compare against known dataset IDs (5 games)
+- Compare against known dataset IDs (5 games) + `IGNORED_DATASET_IDS` (reviewed non-game datasets)
+- Strict relevance filter: only flags datasets with "winning numbers" in the name (all NY draw game datasets follow this SODA naming convention) or watched game names (e.g., "millionaire for life")
+- To suppress a false positive permanently, add its dataset ID to `IGNORED_DATASET_IDS` in `scripts/lib/constants.ts`
 - Auto-create GitHub Issue if new datasets found (e.g., Millionaire for Life)
 - Auto-close resolved automation-failure Issues (`cleanup-stale-issues.ts`)
 - Dependency security audit (`npm audit --audit-level=high`)

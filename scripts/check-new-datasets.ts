@@ -9,7 +9,7 @@
  */
 
 import { withRetry } from './lib/retry';
-import { DATASET_ID_TO_GAME, RETRY_PRESETS } from './lib/constants';
+import { DATASET_ID_TO_GAME, IGNORED_DATASET_IDS, RETRY_PRESETS } from './lib/constants';
 
 const LOTTERY_SEARCH_TERMS = [
   'lottery', 'lotto', 'winning numbers', 'draw', 'jackpot',
@@ -132,22 +132,19 @@ async function main() {
   const catalogEntries = await searchSodaCatalog();
   console.log(`Found ${catalogEntries.length} lottery-related datasets on data.ny.gov`);
 
+  // Filter out known games and previously-reviewed non-game datasets
   const newDatasets = catalogEntries.filter(entry => {
     const id = entry.resource.id;
-    return !DATASET_ID_TO_GAME[id];
+    return !DATASET_ID_TO_GAME[id] && !IGNORED_DATASET_IDS.has(id);
   });
 
-  // Filter to only datasets that look like they contain winning numbers
+  // Strict relevance: require "winning numbers" in name (all NY lottery draw game
+  // datasets follow this convention) OR match watched game names
   const relevantNew = newDatasets.filter(entry => {
     const name = (entry.resource.name || '').toLowerCase();
-    const desc = (entry.resource.description || '').toLowerCase();
-    const combined = `${name} ${desc}`;
     return (
-      combined.includes('winning') ||
-      combined.includes('lottery') ||
-      combined.includes('lotto') ||
-      combined.includes('draw') ||
-      combined.includes('numbers')
+      name.includes('winning numbers') ||
+      name.includes('millionaire for life')
     );
   });
 
@@ -183,22 +180,6 @@ ${relevantNew.map(e => `### ${e.resource.name}
     `[Auto] ${relevantNew.length} new lottery dataset(s) detected`,
     issueBody
   );
-
-  // Optionally trigger auto-onboarding for the first new dataset
-  if (process.env.ANTHROPIC_API_KEY && relevantNew.length > 0) {
-    const firstNew = relevantNew[0];
-    console.log(`\nAttempting auto-onboarding for: ${firstNew.resource.name} (${firstNew.resource.id})`);
-    try {
-      const { execSync } = await import('child_process');
-      execSync(`npx tsx scripts/onboard-new-game.ts ${firstNew.resource.id}`, {
-        cwd: process.cwd(),
-        stdio: 'inherit',
-        env: { ...process.env },
-      });
-    } catch (e) {
-      console.log('Auto-onboarding failed (non-fatal):', e);
-    }
-  }
 }
 
 main().catch((err) => {
