@@ -57,6 +57,9 @@ export const IGNORED_DATASET_IDS = new Set([
   'tw9e-7nms', // NYS Thruway Origin and Destination
   '94fv-bak7', // MTA Subway Elevator and Escalator
   '84qh-f5nv', // NYS Corporate Tax Credits
+  'hsys-3def', // Lottery Daily Numbers/Win-4 (pick-3/pick-4, not yet supported)
+  '7sqk-ycpk', // Lottery Quick Draw (keno-style, not yet supported)
+  'bycu-cw7c', // Lottery Pick 10 (pick-10, not yet supported)
 ]);
 
 /** Check if a game is retired as of the given date. */
