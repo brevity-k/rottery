@@ -1,7 +1,18 @@
 {
   "lottery": "cash4life",
-  "lastUpdated": "2026-02-16T08:05:29.368Z",
+  "lastUpdated": "2026-02-17T08:04:09.946Z",
   "draws": [
+    {
+      "date": "2026-02-15",
+      "numbers": [
+        3,
+        9,
+        10,
+        15,
+        40
+      ],
+      "bonusNumber": 2
+    },
     {
       "date": "2026-02-14",
       "numbers": [
