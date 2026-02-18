@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { DrawResult, LotteryConfig } from '@/lib/lotteries/types';
 import LotteryBall from './LotteryBall';
 import { formatDate } from '@/lib/utils/formatters';
@@ -42,13 +43,17 @@ export default function ResultsTable({ draws, config, limit }: ResultsTableProps
               <td className="py-3 px-4">
                 <div className="flex gap-1.5">
                   {draw.numbers.map((num, i) => (
-                    <LotteryBall key={i} number={num} type="main" size="sm" />
+                    <Link key={i} href={`/${config.slug}/numbers/main-${num}`} title={`View analysis for number ${num}`}>
+                      <LotteryBall number={num} type="main" size="sm" />
+                    </Link>
                   ))}
                 </div>
               </td>
               {hasBonus && (
                 <td className="py-3 px-4">
-                  <LotteryBall number={draw.bonusNumber!} type="bonus" size="sm" color={config.colors.bonusBall} />
+                  <Link href={`/${config.slug}/numbers/bonus-${draw.bonusNumber!}`} title={`View analysis for ${config.bonusNumber.label} ${draw.bonusNumber!}`}>
+                    <LotteryBall number={draw.bonusNumber!} type="bonus" size="sm" color={config.colors.bonusBall} />
+                  </Link>
                 </td>
               )}
               {hasMultiplier && (

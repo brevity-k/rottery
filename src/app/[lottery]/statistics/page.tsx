@@ -114,13 +114,13 @@ export default async function StatisticsPage({ params }: { params: Promise<{ lot
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Most Frequent Numbers</h2>
                 <div className="space-y-3">
                   {topFrequent.map(f => (
-                    <div key={f.number} className="flex items-center justify-between">
+                    <Link key={f.number} href={`/${slug}/numbers/main-${f.number}`} className="flex items-center justify-between hover:bg-gray-50 rounded-lg p-1 -mx-1 transition-colors">
                       <div className="flex items-center gap-3">
                         <LotteryBall number={f.number} type="main" size="sm" />
                         <span className="text-sm text-gray-600">{f.count} times</span>
                       </div>
                       <span className="text-sm font-medium text-gray-900">{formatPercentage(f.percentage)}</span>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </Card>
@@ -129,13 +129,13 @@ export default async function StatisticsPage({ params }: { params: Promise<{ lot
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Least Frequent Numbers</h2>
                 <div className="space-y-3">
                   {leastFrequent.map(f => (
-                    <div key={f.number} className="flex items-center justify-between">
+                    <Link key={f.number} href={`/${slug}/numbers/main-${f.number}`} className="flex items-center justify-between hover:bg-gray-50 rounded-lg p-1 -mx-1 transition-colors">
                       <div className="flex items-center gap-3">
                         <LotteryBall number={f.number} type="main" size="sm" />
                         <span className="text-sm text-gray-600">{f.count} times</span>
                       </div>
                       <span className="text-sm font-medium text-gray-900">{formatPercentage(f.percentage)}</span>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </Card>
@@ -147,11 +147,11 @@ export default async function StatisticsPage({ params }: { params: Promise<{ lot
               <p className="text-sm text-gray-500 mb-4">Numbers that haven&apos;t appeared for longer than their expected interval.</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
                 {mostOverdue.map(o => (
-                  <div key={o.number} className="text-center p-3 bg-gray-50 rounded-lg">
+                  <Link key={o.number} href={`/${slug}/numbers/main-${o.number}`} className="text-center p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors">
                     <LotteryBall number={o.number} type="main" size="md" />
                     <p className="text-xs text-gray-500 mt-2">{o.drawsSinceLastDrawn} draws ago</p>
                     <p className="text-xs font-medium text-red-600">{Math.round(o.overdueRatio * 100)}% overdue</p>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </Card>
@@ -163,9 +163,9 @@ export default async function StatisticsPage({ params }: { params: Promise<{ lot
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                   {pairs.map((p, i) => (
                     <div key={i} className="flex items-center justify-center gap-1 p-3 bg-gray-50 rounded-lg">
-                      <LotteryBall number={p.pair[0]} type="main" size="sm" />
+                      <Link href={`/${slug}/numbers/main-${p.pair[0]}`}><LotteryBall number={p.pair[0]} type="main" size="sm" /></Link>
                       <span className="text-gray-400 text-xs">+</span>
-                      <LotteryBall number={p.pair[1]} type="main" size="sm" />
+                      <Link href={`/${slug}/numbers/main-${p.pair[1]}`}><LotteryBall number={p.pair[1]} type="main" size="sm" /></Link>
                       <span className="text-xs text-gray-500 ml-1">({p.count})</span>
                     </div>
                   ))}
@@ -181,11 +181,11 @@ export default async function StatisticsPage({ params }: { params: Promise<{ lot
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                   {triplets.map((t, i) => (
                     <div key={i} className="flex items-center justify-center gap-1 p-3 bg-gray-50 rounded-lg">
-                      <LotteryBall number={t.triplet[0]} type="main" size="sm" />
+                      <Link href={`/${slug}/numbers/main-${t.triplet[0]}`}><LotteryBall number={t.triplet[0]} type="main" size="sm" /></Link>
                       <span className="text-gray-400 text-xs">+</span>
-                      <LotteryBall number={t.triplet[1]} type="main" size="sm" />
+                      <Link href={`/${slug}/numbers/main-${t.triplet[1]}`}><LotteryBall number={t.triplet[1]} type="main" size="sm" /></Link>
                       <span className="text-gray-400 text-xs">+</span>
-                      <LotteryBall number={t.triplet[2]} type="main" size="sm" />
+                      <Link href={`/${slug}/numbers/main-${t.triplet[2]}`}><LotteryBall number={t.triplet[2]} type="main" size="sm" /></Link>
                       <span className="text-xs text-gray-500 ml-1">({t.count})</span>
                     </div>
                   ))}
@@ -201,13 +201,13 @@ export default async function StatisticsPage({ params }: { params: Promise<{ lot
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                   {quadruplets.map((q, i) => (
                     <div key={i} className="flex items-center justify-center gap-1 p-3 bg-gray-50 rounded-lg">
-                      <LotteryBall number={q.quadruplet[0]} type="main" size="sm" />
+                      <Link href={`/${slug}/numbers/main-${q.quadruplet[0]}`}><LotteryBall number={q.quadruplet[0]} type="main" size="sm" /></Link>
                       <span className="text-gray-400 text-xs">+</span>
-                      <LotteryBall number={q.quadruplet[1]} type="main" size="sm" />
+                      <Link href={`/${slug}/numbers/main-${q.quadruplet[1]}`}><LotteryBall number={q.quadruplet[1]} type="main" size="sm" /></Link>
                       <span className="text-gray-400 text-xs">+</span>
-                      <LotteryBall number={q.quadruplet[2]} type="main" size="sm" />
+                      <Link href={`/${slug}/numbers/main-${q.quadruplet[2]}`}><LotteryBall number={q.quadruplet[2]} type="main" size="sm" /></Link>
                       <span className="text-gray-400 text-xs">+</span>
-                      <LotteryBall number={q.quadruplet[3]} type="main" size="sm" />
+                      <Link href={`/${slug}/numbers/main-${q.quadruplet[3]}`}><LotteryBall number={q.quadruplet[3]} type="main" size="sm" /></Link>
                       <span className="text-xs text-gray-500 ml-1">({q.count})</span>
                     </div>
                   ))}

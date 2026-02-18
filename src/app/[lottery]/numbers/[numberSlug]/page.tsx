@@ -123,6 +123,13 @@ export default async function NumberDetailPage({ params }: { params: Promise<{ l
 
   const faqs = getNumberDetailFaqs(lottery, number, type);
 
+  // Prev/next navigation
+  const maxNum = type === 'main' ? lottery.mainNumbers.max : lottery.bonusNumber.max;
+  const prevNum = number > 1 ? number - 1 : null;
+  const nextNum = number < maxNum ? number + 1 : null;
+  const prevHref = prevNum ? `/${slug}/numbers/${type}-${prevNum}` : null;
+  const nextHref = nextNum ? `/${slug}/numbers/${type}-${nextNum}` : null;
+
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -247,6 +254,23 @@ export default async function NumberDetailPage({ params }: { params: Promise<{ l
             <p className="text-center text-gray-500 py-8">No data available for this number.</p>
           </Card>
         )}
+
+        {/* Prev/Next Navigation */}
+        <nav className="flex items-center justify-between mb-8" aria-label="Number navigation">
+          {prevHref ? (
+            <Link href={prevHref} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              <span aria-hidden="true">&larr;</span> {label} #{prevNum}
+            </Link>
+          ) : <span />}
+          <Link href={`/${slug}/numbers`} className="text-sm text-blue-600 hover:underline">
+            All Numbers
+          </Link>
+          {nextHref ? (
+            <Link href={nextHref} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              {label} #{nextNum} <span aria-hidden="true">&rarr;</span>
+            </Link>
+          ) : <span />}
+        </nav>
 
         <FAQSection faqs={faqs} />
 
