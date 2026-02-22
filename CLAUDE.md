@@ -121,10 +121,10 @@ rottery/
 │   │   └── utils/     formatters.ts, constants.ts
 │   └── data/
 │       ├── powerball.json           # ~1,904 draws (2010 to present)
-│       ├── mega-millions.json       # ~2,477 draws (2002 to present)
-│       ├── cash4life.json           # ~2,947 draws (2014 to present)
+│       ├── mega-millions.json       # ~2,478 draws (2002 to present)
+│       ├── cash4life.json           # ~2,948 draws (2014 to present)
 │       ├── ny-lotto.json            # ~2,550 draws (2001 to present)
-│       ├── take5.json               # ~12,192 draws (2001 to present, 2x/day)
+│       ├── take5.json               # ~12,194 draws (2001 to present, 2x/day)
 │       └── state-tax-rates.ts       # All 50 states + DC tax data (auto-updated quarterly)
 ├── scripts/
 │   ├── lib/
