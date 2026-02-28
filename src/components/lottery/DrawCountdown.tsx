@@ -1,7 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { getNextDrawDate, type NextDrawInfo } from '@/lib/utils/drawSchedule';
+import { useState, useEffect, useMemo, useSyncExternalStore } from 'react';
+import { getNextDrawDate } from '@/lib/utils/drawSchedule';
+
+const emptySubscribe = () => () => {};
+function useIsMounted() {
+  return useSyncExternalStore(emptySubscribe, () => true, () => false);
+}
 
 interface DrawCountdownProps {
   drawDays: string[];
@@ -42,38 +47,24 @@ export default function DrawCountdown({
   variant = 'compact',
   colorClass,
 }: DrawCountdownProps) {
-  const [mounted, setMounted] = useState(false);
-  const [drawInfo, setDrawInfo] = useState<NextDrawInfo | null>(null);
-  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-    const info = getNextDrawDate({ drawDays, drawTime, retiredDate });
-    setDrawInfo(info);
-    if (info && !info.isRetired) {
-      setTimeLeft(getTimeLeft(info.date));
-    }
-  }, [drawDays, drawTime, retiredDate]);
+  const mounted = useIsMounted();
+  const drawInfo = useMemo(
+    () => getNextDrawDate({ drawDays, drawTime, retiredDate }),
+    [drawDays, drawTime, retiredDate]
+  );
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(
+    () => drawInfo && !drawInfo.isRetired ? getTimeLeft(drawInfo.date) : null
+  );
 
   useEffect(() => {
     if (!drawInfo || drawInfo.isRetired) return;
 
-    const interval = setInterval(() => {
-      const t = getTimeLeft(drawInfo.date);
-      setTimeLeft(t);
+    const tick = () => setTimeLeft(getTimeLeft(drawInfo.date));
+    tick();
 
-      // If countdown finished, recalculate next draw
-      if (t.days === 0 && t.hours === 0 && t.minutes === 0 && t.seconds === 0) {
-        const newInfo = getNextDrawDate({ drawDays, drawTime, retiredDate });
-        setDrawInfo(newInfo);
-        if (newInfo && !newInfo.isRetired) {
-          setTimeLeft(getTimeLeft(newInfo.date));
-        }
-      }
-    }, 1000);
-
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [drawInfo, drawDays, drawTime, retiredDate]);
+  }, [drawInfo]);
 
   // SSR placeholder
   if (!mounted) {
