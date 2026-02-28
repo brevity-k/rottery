@@ -62,7 +62,7 @@ src/
 │   │   ├── results/page.tsx          # Full history
 │   │   ├── results/[year]/           # Year archives
 │   │   └── statistics/page.tsx       # Frequency, hot/cold, pairs, triplets
-│   ├── states/                       # 48 state hub pages
+│   ├── states/                       # 46 state hub pages
 │   ├── tools/                        # tax-calculator, number-generator, odds-calculator, ticket-checker
 │   ├── blog/[slug]/                  # Blog articles
 │   ├── api/contact/route.ts          # Serverless email (Resend)

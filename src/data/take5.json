@@ -1,7 +1,127 @@
 {
   "lottery": "take5",
-  "lastUpdated": "2026-02-23T08:06:50.745Z",
+  "lastUpdated": "2026-02-28T07:04:52.743Z",
   "draws": [
+    {
+      "date": "2026-02-26",
+      "numbers": [
+        7,
+        13,
+        16,
+        24,
+        37
+      ],
+      "bonusNumber": null,
+      "drawTime": "midday"
+    },
+    {
+      "date": "2026-02-26",
+      "numbers": [
+        15,
+        17,
+        20,
+        23,
+        27
+      ],
+      "bonusNumber": null,
+      "drawTime": "evening"
+    },
+    {
+      "date": "2026-02-25",
+      "numbers": [
+        19,
+        25,
+        27,
+        30,
+        36
+      ],
+      "bonusNumber": null,
+      "drawTime": "midday"
+    },
+    {
+      "date": "2026-02-25",
+      "numbers": [
+        9,
+        18,
+        21,
+        25,
+        38
+      ],
+      "bonusNumber": null,
+      "drawTime": "evening"
+    },
+    {
+      "date": "2026-02-24",
+      "numbers": [
+        14,
+        25,
+        27,
+        28,
+        29
+      ],
+      "bonusNumber": null,
+      "drawTime": "midday"
+    },
+    {
+      "date": "2026-02-24",
+      "numbers": [
+        15,
+        16,
+        34,
+        35,
+        36
+      ],
+      "bonusNumber": null,
+      "drawTime": "evening"
+    },
+    {
+      "date": "2026-02-23",
+      "numbers": [
+        5,
+        8,
+        17,
+        29,
+        37
+      ],
+      "bonusNumber": null,
+      "drawTime": "midday"
+    },
+    {
+      "date": "2026-02-23",
+      "numbers": [
+        2,
+        10,
+        13,
+        24,
+        32
+      ],
+      "bonusNumber": null,
+      "drawTime": "evening"
+    },
+    {
+      "date": "2026-02-22",
+      "numbers": [
+        15,
+        29,
+        30,
+        33,
+        38
+      ],
+      "bonusNumber": null,
+      "drawTime": "midday"
+    },
+    {
+      "date": "2026-02-22",
+      "numbers": [
+        14,
+        25,
+        27,
+        31,
+        32
+      ],
+      "bonusNumber": null,
+      "drawTime": "evening"
+    },
     {
       "date": "2026-02-21",
       "numbers": [
