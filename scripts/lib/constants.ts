@@ -23,6 +23,7 @@ export const KNOWN_DATASETS: Record<string, { name: string; slug: string; datase
   'cash4life':      { name: 'Cash4Life',      slug: 'cash4life',      datasetId: 'kwxv-fwze', retiredDate: '2026-02-21' },
   'ny-lotto':       { name: 'NY Lotto',       slug: 'ny-lotto',       datasetId: '6nbc-h7bj' },
   'take5':          { name: 'Take 5',         slug: 'take5',          datasetId: 'dg63-4siq' },
+  'millionaire-for-life': { name: 'Millionaire for Life', slug: 'millionaire-for-life', datasetId: 'a4w9-a3tp' },
 };
 
 /** Lookup from dataset ID → game slug (for check-new-datasets.ts deduplication). */
@@ -151,13 +152,14 @@ export const MIN_DRAWS: Record<string, number> = {
   'cash4life.json': 2900,
   'ny-lotto.json': 2500,
   'take5.json': 12000,
+  'millionaire-for-life.json': 5,
 };
 
 /** Minimum page count for build output. Derived from game pages + number pages + states + tools + blog + static. */
 export const MIN_PAGES = 550;
 
 /** All lottery data files that must exist. */
-export const LOTTERY_DATA_FILES = ['powerball.json', 'mega-millions.json', 'cash4life.json', 'ny-lotto.json', 'take5.json'];
+export const LOTTERY_DATA_FILES = ['powerball.json', 'mega-millions.json', 'cash4life.json', 'ny-lotto.json', 'take5.json', 'millionaire-for-life.json'];
 
 /** Maximum days before data is considered stale in SEO health check. */
 export const DATA_STALENESS_DAYS = 7;

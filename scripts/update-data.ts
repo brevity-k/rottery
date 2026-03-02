@@ -8,6 +8,7 @@
  * - Cash4Life (bonus in cash_ball field)
  * - NY Lotto (bonus in bonus field)
  * - Take 5 (midday/evening fields, no bonus)
+ * - Millionaire for Life (bonus in mill_ball field)
  */
 
 import * as fs from 'fs';
@@ -74,6 +75,14 @@ const VALIDATION_CONFIG: Record<string, LotterySourceValidation> = {
     bonusMax: 0,
     middayField: 'midday_winning_numbers',
     eveningField: 'evening_winning_numbers',
+    expectedDrawDays: [0, 1, 2, 3, 4, 5, 6],  // Daily
+    staleDays: 3,
+  },
+  'millionaire-for-life': {
+    mainCount: 5,
+    mainMax: 58,
+    bonusMax: 5,
+    bonusField: 'mill_ball',
     expectedDrawDays: [0, 1, 2, 3, 4, 5, 6],  // Daily
     staleDays: 3,
   },

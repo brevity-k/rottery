@@ -94,7 +94,7 @@ export function getNumberGeneratorFaqs(): FAQ[] {
     },
     {
       question: 'Can I generate numbers for any lottery game?',
-      answer: 'Our generator supports Powerball (5/69 + 1/26), Mega Millions (5/70 + 1/24), Cash4Life (5/60 + 1/4), NY Lotto (6/59 + bonus), and Take 5 (5/39). Each generator is configured with the correct number ranges for its game.',
+      answer: 'Our generator supports Powerball (5/69 + 1/26), Mega Millions (5/70 + 1/24), Millionaire for Life (5/58 + 1/5), Cash4Life (5/60 + 1/4), NY Lotto (6/59 + bonus), and Take 5 (5/39). Each generator is configured with the correct number ranges for its game.',
     },
     {
       question: 'How many sets of numbers can I generate?',

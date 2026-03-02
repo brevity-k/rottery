@@ -12,7 +12,7 @@ Free, SEO-optimized lottery statistics website for US lotteries. Hybrid renderin
 - **Repo:** https://github.com/brevity-k/lottery
 - **Hosting:** Vercel (auto-deploys on push) | **DNS:** Porkbun
 - **Analytics:** GA G-5TW1TM399X | **Search Console:** Verified
-- **Pages:** ~634 static + 1 serverless API route
+- **Pages:** ~700+ static + 1 serverless API route
 
 ## Tech Stack
 
@@ -23,7 +23,7 @@ Free, SEO-optimized lottery statistics website for US lotteries. Hybrid renderin
 | Styling | Tailwind CSS v4 |
 | Charts | Recharts 3 |
 | Email | Resend (contact form) |
-| Data source | NY Open Data SODA API (free, no key) — 5 games |
+| Data source | NY Open Data SODA API (free, no key) — 6 games |
 | Data storage | JSON files in `src/data/` |
 | Blog | Claude Haiku via Anthropic API (daily, 14-topic rotation) |
 | Social | twitter-api-v2 (daily auto-post to X) |
@@ -37,11 +37,12 @@ Free, SEO-optimized lottery statistics website for US lotteries. Hybrid renderin
 | Cash4Life | `cash4life` | 5/60 + 1/4 | Cash Ball | Retired Feb 21, 2026 | `kwxv-fwze` |
 | NY Lotto | `ny-lotto` | 6/59 + 1/59 | Bonus | Wed, Sat 8:15 PM ET | `6nbc-h7bj` |
 | Take 5 | `take5` | 5/39 | **None** | Daily 2:30 PM & 10:30 PM ET | `dg63-4siq` |
+| Millionaire for Life | `millionaire-for-life` | 5/58 + 1/5 | Millionaire Ball | Daily 11:15 PM ET | `a4w9-a3tp` |
 
 **Key patterns:**
 - Take 5: no bonus (`bonusNumber.count === 0`), two draws/day (`drawTime: 'midday' | 'evening'`)
 - Cash4Life: retired Feb 21, 2026 — historical data only, stale checks skipped
-- Millionaire for Life: launched Feb 22, 2026 replacing Cash4Life — awaiting SODA dataset
+- Millionaire for Life: launched Feb 22, 2026 replacing Cash4Life — SODA dataset `a4w9-a3tp`
 
 **Known historical anomalies (expected warnings):**
 - Powerball bonus was 1-35 before Oct 2015 (now 1-26)
@@ -103,7 +104,7 @@ content/blog/                 # Auto-generated daily blog posts (JSON)
 
 ```bash
 npm run dev / build / start / lint
-npx tsx scripts/update-data.ts              # Fetch 5 games from SODA API
+npx tsx scripts/update-data.ts              # Fetch 6 games from SODA API
 npx tsx scripts/generate-blog-post.ts       # Daily blog (needs ANTHROPIC_API_KEY)
 npx tsx scripts/post-to-x.ts               # Post to X (needs X API keys)
 npx tsx scripts/check-new-datasets.ts       # Scan for new SODA datasets
@@ -194,7 +195,7 @@ Every results/analysis page must include:
 **Phase 3 — Full Coverage & Monetization (target: 1000+ pages):**
 - [ ] All 50 state hubs (currently 48)
 - [ ] Pick 3/Pick 4/daily games
-- [ ] Millionaire for Life (awaiting SODA dataset)
+- [x] Millionaire for Life (onboarded — SODA dataset `a4w9-a3tp`)
 - [ ] Monthly archive pages
 - [ ] Enhanced analysis (streaks, bell curves)
 - [ ] Email newsletter / jackpot alerts

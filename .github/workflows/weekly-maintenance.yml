@@ -111,10 +111,13 @@ jobs:
         run: npm ci
 
       - name: Run npm audit
-        run: npm audit --audit-level=high
+        id: audit
+        run: |
+          npm audit --audit-level=high > audit-output.txt 2>&1 && echo "found=false" >> "$GITHUB_OUTPUT" || echo "found=true" >> "$GITHUB_OUTPUT"
+          cat audit-output.txt
 
-      - name: Notify on vulnerabilities
-        if: failure()
+      - name: Create issue for vulnerabilities
+        if: steps.audit.outputs.found == 'true'
         uses: actions/github-script@v7
         with:
           script: |

@@ -1,0 +1,94 @@
+{
+  "lottery": "millionaire-for-life",
+  "lastUpdated": "2026-03-02T14:09:35.827Z",
+  "draws": [
+    {
+      "date": "2026-03-01",
+      "numbers": [
+        10,
+        11,
+        12,
+        35,
+        56
+      ],
+      "bonusNumber": 4
+    },
+    {
+      "date": "2026-02-28",
+      "numbers": [
+        13,
+        20,
+        28,
+        44,
+        48
+      ],
+      "bonusNumber": 4
+    },
+    {
+      "date": "2026-02-27",
+      "numbers": [
+        3,
+        4,
+        13,
+        28,
+        42
+      ],
+      "bonusNumber": 2
+    },
+    {
+      "date": "2026-02-26",
+      "numbers": [
+        3,
+        14,
+        22,
+        50,
+        57
+      ],
+      "bonusNumber": 4
+    },
+    {
+      "date": "2026-02-25",
+      "numbers": [
+        1,
+        33,
+        35,
+        39,
+        55
+      ],
+      "bonusNumber": 3
+    },
+    {
+      "date": "2026-02-24",
+      "numbers": [
+        12,
+        15,
+        33,
+        46,
+        53
+      ],
+      "bonusNumber": 5
+    },
+    {
+      "date": "2026-02-23",
+      "numbers": [
+        11,
+        18,
+        21,
+        25,
+        55
+      ],
+      "bonusNumber": 1
+    },
+    {
+      "date": "2026-02-22",
+      "numbers": [
+        1,
+        30,
+        48,
+        54,
+        58
+      ],
+      "bonusNumber": 4
+    }
+  ]
+}

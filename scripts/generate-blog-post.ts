@@ -139,6 +139,7 @@ const GAMES = [
   { slug: 'cash4life', name: 'Cash4Life', maxMain: 60, hasBonus: true, bonusLabel: 'CB' },
   { slug: 'ny-lotto', name: 'NY Lotto', maxMain: 59, hasBonus: true, bonusLabel: 'Bonus' },
   { slug: 'take5', name: 'Take 5', maxMain: 39, hasBonus: false, bonusLabel: '' },
+  { slug: 'millionaire-for-life', name: 'Millionaire for Life', maxMain: 58, hasBonus: true, bonusLabel: 'ML' },
 ];
 
 // ---------------------------------------------------------------------------
