@@ -57,12 +57,24 @@ export default function PrivacyPage() {
             {SITE_NAME} does not store personal user data on our servers. All number generation happens client-side in your browser. We do not collect or store any lottery numbers you generate.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900">5. Your Rights</h2>
+          <h2 className="text-2xl font-bold text-gray-900">5. My Numbers Feature</h2>
+          <p className="text-gray-600">
+            When you use the My Numbers feature, your number sets are stored locally in your
+            browser&apos;s localStorage. This data:
+          </p>
+          <ul className="text-gray-600 space-y-1 list-disc list-inside">
+            <li>Never leaves your device</li>
+            <li>Is not collected, transmitted, or accessible to us</li>
+            <li>Is not included in any analytics</li>
+            <li>Can be cleared at any time through your browser settings</li>
+          </ul>
+
+          <h2 className="text-2xl font-bold text-gray-900">6. Your Rights</h2>
           <p className="text-gray-600">
             You have the right to opt out of analytics tracking and manage your cookie preferences through your browser settings.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900">6. Contact</h2>
+          <h2 className="text-2xl font-bold text-gray-900">7. Contact</h2>
           <p className="text-gray-600">
             For privacy-related inquiries, please contact us through our website.
           </p>
