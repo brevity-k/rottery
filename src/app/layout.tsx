@@ -26,6 +26,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   verification: {
     google: "owEfQh-C4tj4NvFXcKGUl-q6uNOnXyGkGyS92-SeKW4",
+    other: {
+      "naver-site-verification": ["5d634d2779403f83bb4a2417cae392e8ad9df523"],
+    },
   },
   openGraph: {
     siteName: SITE_NAME,
