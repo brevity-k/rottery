@@ -122,6 +122,19 @@ export default function WhatIfSimulator({ lotteries, drawsByGame }: WhatIfSimula
     return `${matched} out of ${count} numbers`;
   };
 
+  // Loading state — show before input or results
+  if (isAnalyzing) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-4">
+        <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mb-4" />
+        <p className="text-lg font-medium text-gray-900">
+          Replaying {draws.length.toLocaleString()} draws...
+        </p>
+        <p className="text-sm text-gray-400 mt-1">This may take a moment</p>
+      </div>
+    );
+  }
+
   // Results reveal
   if (result && resultsData && lottery) {
     const { totalSpent, netResult, closestToJackpot, winningDraws, activeTiers } = resultsData;
@@ -129,6 +142,17 @@ export default function WhatIfSimulator({ lotteries, drawsByGame }: WhatIfSimula
 
     return (
       <div className="space-y-8">
+        <style>{`
+          @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+          }
+        `}</style>
+
         {/* 1. Back button */}
         <button
           onClick={() => setResult(null)}
@@ -161,7 +185,7 @@ export default function WhatIfSimulator({ lotteries, drawsByGame }: WhatIfSimula
         </div>
 
         {/* 3. The Spend */}
-        <div className="text-center py-6">
+        <div className="fade-in-up text-center py-6" style={{ animationDelay: '0ms' }}>
           <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">
             If you played every {lottery.name} draw
           </p>
@@ -174,7 +198,7 @@ export default function WhatIfSimulator({ lotteries, drawsByGame }: WhatIfSimula
         </div>
 
         {/* 4. The Winnings */}
-        <div className="text-center py-6 border-t border-gray-100">
+        <div className="fade-in-up text-center py-6 border-t border-gray-100" style={{ animationDelay: '300ms' }}>
           <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">
             You would have won
           </p>
@@ -188,7 +212,7 @@ export default function WhatIfSimulator({ lotteries, drawsByGame }: WhatIfSimula
 
         {/* 5. The Near-Miss Moment */}
         {closestToJackpot && closestToJackpot.matched >= 2 && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
+          <div className="fade-in-up bg-amber-50 border border-amber-200 rounded-xl p-6 text-center" style={{ animationDelay: '600ms' }}>
             <p className="text-sm font-medium text-amber-700 uppercase tracking-wide mb-2">
               Your closest call
             </p>
@@ -208,7 +232,7 @@ export default function WhatIfSimulator({ lotteries, drawsByGame }: WhatIfSimula
 
         {/* 6. Prize Breakdown Table */}
         {activeTiers.length > 0 && (
-          <div className="border border-gray-200 rounded-xl overflow-hidden">
+          <div className="fade-in-up border border-gray-200 rounded-xl overflow-hidden" style={{ animationDelay: '900ms' }}>
             <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
               <h3 className="font-semibold text-gray-900">Prize Breakdown</h3>
             </div>
@@ -243,7 +267,7 @@ export default function WhatIfSimulator({ lotteries, drawsByGame }: WhatIfSimula
 
         {/* 7. Match History */}
         {winningDraws.length > 0 ? (
-          <div>
+          <div className="fade-in-up" style={{ animationDelay: '900ms' }}>
             <h3 className="font-semibold text-gray-900 mb-3">
               Your Match History &mdash; {result.matchTimeline.length.toLocaleString()} winning draw{result.matchTimeline.length !== 1 ? 's' : ''}
             </h3>
@@ -271,7 +295,7 @@ export default function WhatIfSimulator({ lotteries, drawsByGame }: WhatIfSimula
           </div>
         ) : (
           /* 8. No Matches Fallback */
-          <div className="text-center py-8">
+          <div className="fade-in-up text-center py-8" style={{ animationDelay: '900ms' }}>
             <p className="text-gray-500">
               No matches across {result.totalDrawsChecked.toLocaleString()} draws. Your numbers are truly unique.
             </p>
@@ -344,7 +368,7 @@ export default function WhatIfSimulator({ lotteries, drawsByGame }: WhatIfSimula
           </p>
 
           {/* Main Number Grid */}
-          <div className="grid grid-cols-7 sm:grid-cols-10 gap-2 max-w-md sm:max-w-xl mx-auto">
+          <div className={`grid ${mainMax <= 39 ? 'grid-cols-8' : 'grid-cols-7'} sm:grid-cols-10 gap-2 max-w-md sm:max-w-xl mx-auto`}>
             {Array.from({ length: mainMax }, (_, i) => i + 1).map(num => {
               const isSelected = selectedNumbers.includes(num);
               const isDisabled = !isSelected && mainNumbersFull;
