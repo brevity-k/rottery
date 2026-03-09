@@ -43,8 +43,8 @@ export default function HomePage() {
           <Link href="/tools/tax-calculator" className="px-5 py-2.5 rounded-full text-sm font-medium bg-green-50 text-green-700 hover:bg-green-100 transition-colors">
             Tax Calculator
           </Link>
-          <Link href="/tools/number-generator" className="px-5 py-2.5 rounded-full text-sm font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors">
-            Number Generator
+          <Link href="/tools/odds-calculator" className="px-5 py-2.5 rounded-full text-sm font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors">
+            Odds Calculator
           </Link>
         </div>
       </section>

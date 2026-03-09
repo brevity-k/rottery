@@ -82,27 +82,6 @@ export function getTaxCalculatorFaqs(): FAQ[] {
   ];
 }
 
-export function getNumberGeneratorFaqs(): FAQ[] {
-  return [
-    {
-      question: 'Is the lottery number generator truly random?',
-      answer: 'Yes. We use crypto.getRandomValues(), the Web Crypto API standard used in security applications. This produces cryptographically secure random numbers, which are significantly more random than Math.random(). All generation happens in your browser — no data is sent to any server.',
-    },
-    {
-      question: 'Are generated numbers luckier than Quick Pick?',
-      answer: 'No. Our generator and retail Quick Pick systems both produce random numbers. Lottery outcomes are entirely random, and no set of numbers is more likely to win than another. About 70% of lottery winners used Quick Pick, but that reflects purchasing habits, not luck.',
-    },
-    {
-      question: 'Can I generate numbers for any lottery game?',
-      answer: 'Our generator supports Powerball (5/69 + 1/26), Mega Millions (5/70 + 1/24), Millionaire for Life (5/58 + 1/5), Cash4Life (5/60 + 1/4), NY Lotto (6/59 + bonus), and Take 5 (5/39). Each generator is configured with the correct number ranges for its game.',
-    },
-    {
-      question: 'How many sets of numbers can I generate?',
-      answer: 'You can generate as many sets as you like — there is no limit. Each click produces a fresh set of random numbers. Since generation happens entirely in your browser, it is instant and free.',
-    },
-  ];
-}
-
 export function getOddsCalculatorFaqs(): FAQ[] {
   return [
     {
@@ -120,27 +99,6 @@ export function getOddsCalculatorFaqs(): FAQ[] {
     {
       question: 'What are the odds of winning any prize?',
       answer: 'Overall odds of winning any prize are much better than jackpot odds. Powerball has about 1 in 24.87 overall odds, meaning roughly 1 in 25 tickets wins something (though most prizes are small, like $4). Mega Millions overall odds are approximately 1 in 24.',
-    },
-  ];
-}
-
-export function getTicketCheckerFaqs(): FAQ[] {
-  return [
-    {
-      question: 'How does the ticket checker work?',
-      answer: 'Enter your numbers and select the draw date for any supported lottery game. Our tool compares your numbers against the official winning numbers from that draw, highlighting matches and showing how many numbers you matched. All checking happens in your browser.',
-    },
-    {
-      question: 'How far back can I check lottery numbers?',
-      answer: 'You can check numbers against draws from the past year (approximately 365 days). For Powerball that covers about 156 draws, Mega Millions about 104 draws, and daily games like Take 5 about 730 draws.',
-    },
-    {
-      question: 'Is this an official ticket checker?',
-      answer: 'No. This is an unofficial tool for informational purposes. Always verify your results with your state lottery commission or the official lottery website. In the event of a discrepancy, official winning numbers shall control.',
-    },
-    {
-      question: 'Can I check multiple tickets at once?',
-      answer: 'Currently, you can check one set of numbers per draw at a time. Select your game, enter your numbers, choose the draw date, and click Check. You can repeat the process for additional tickets.',
     },
   ];
 }

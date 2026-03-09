@@ -81,14 +81,8 @@ function ToolsDropdown() {
           <Link href="/tools/tax-calculator" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" role="menuitem">
             Tax Calculator
           </Link>
-          <Link href="/tools/number-generator" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" role="menuitem">
-            Number Generator
-          </Link>
           <Link href="/tools/odds-calculator" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" role="menuitem">
             Odds Calculator
-          </Link>
-          <Link href="/tools/ticket-checker" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" role="menuitem">
-            Ticket Checker
           </Link>
         </div>
       </div>
@@ -125,14 +119,8 @@ function MobileMenu({ lotteries }: { lotteries: ReturnType<typeof getAllLotterie
           <Link href="/tools/tax-calculator" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
             Tax Calculator
           </Link>
-          <Link href="/tools/number-generator" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-            Number Generator
-          </Link>
           <Link href="/tools/odds-calculator" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
             Odds Calculator
-          </Link>
-          <Link href="/tools/ticket-checker" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-            Ticket Checker
           </Link>
           <div className="border-t border-gray-100 my-1" />
           <Link href="/my-numbers" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">

@@ -9,9 +9,8 @@ export default function NotFound() {
     { href: '/ny-lotto', label: 'NY Lotto', description: 'Results & statistics' },
     { href: '/take5', label: 'Take 5', description: 'Results & statistics' },
     { href: '/tools/tax-calculator', label: 'Tax Calculator', description: 'Estimate your winnings' },
-    { href: '/tools/number-generator', label: 'Number Generator', description: 'Random number sets' },
-    { href: '/tools/ticket-checker', label: 'Ticket Checker', description: 'Check your numbers' },
     { href: '/tools/odds-calculator', label: 'Odds Calculator', description: 'Prize probabilities' },
+    { href: '/simulator', label: 'What If?', description: 'Test your lucky numbers' },
     { href: '/blog', label: 'Blog', description: 'Tips & guides' },
     { href: '/states', label: 'States', description: 'State lottery info' },
   ];
