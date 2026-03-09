@@ -19,9 +19,6 @@ export default function Header() {
             </Link>
             <LotteriesDropdown lotteries={lotteries} />
             <ToolsDropdown />
-            <Link href="/my-numbers" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
-              My Numbers
-            </Link>
             <Link href="/states" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
               States
             </Link>
@@ -123,9 +120,6 @@ function MobileMenu({ lotteries }: { lotteries: ReturnType<typeof getAllLotterie
             Odds Calculator
           </Link>
           <div className="border-t border-gray-100 my-1" />
-          <Link href="/my-numbers" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-            My Numbers
-          </Link>
           <Link href="/states" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
             States
           </Link>
