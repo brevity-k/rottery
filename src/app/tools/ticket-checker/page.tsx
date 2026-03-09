@@ -3,7 +3,7 @@ import { getAllLotteries } from '@/lib/lotteries/config';
 import { loadLotteryData } from '@/lib/data/fetcher';
 import { softwareAppSchema, breadcrumbSchema, faqSchema } from '@/lib/seo/structuredData';
 import { getTicketCheckerFaqs } from '@/lib/seo/faqContent';
-import { SITE_NAME, SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
+import { SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
 import { DrawResult } from '@/lib/lotteries/types';
 import TicketChecker from '@/components/tools/TicketChecker';
 import JsonLd from '@/components/seo/JsonLd';
@@ -11,11 +11,11 @@ import FAQSection from '@/components/seo/FAQSection';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: `Lottery Ticket Checker - Check Your Numbers | ${SITE_NAME}`,
-  description: 'Check your lottery numbers against past draws. Instantly see how many numbers you matched for Powerball, Mega Millions, Cash4Life, NY Lotto, and Take 5.',
+  title: { absolute: 'Lottery Ticket Checker - Did You Win? Check Numbers Free' },
+  description: 'Check your lottery numbers against past draws. See matches instantly for Powerball, Mega Millions & more. Free & updated daily.',
   openGraph: {
-    title: `Lottery Ticket Checker | ${SITE_NAME}`,
-    description: 'Check your lottery numbers against past draws. Instantly see how many numbers you matched.',
+    title: 'Lottery Ticket Checker - Did You Win? Check Numbers Free',
+    description: 'Check your lottery numbers against past draws. See matches instantly for Powerball, Mega Millions & more.',
     url: `${SITE_URL}/tools/ticket-checker`,
   },
   alternates: {

@@ -5,7 +5,7 @@ import { getState, getAllStateSlugs } from '@/lib/states/config';
 import { getLottery } from '@/lib/lotteries/config';
 import { loadLotteryData } from '@/lib/data/fetcher';
 import { breadcrumbSchema, faqSchema } from '@/lib/seo/structuredData';
-import { SITE_NAME, SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
+import { SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import ResultsTable from '@/components/lottery/ResultsTable';
 import JsonLd from '@/components/seo/JsonLd';
@@ -20,11 +20,12 @@ export async function generateMetadata({ params }: { params: Promise<{ state: st
   const state = getState(slug);
   if (!state) return {};
 
-  const title = `${state.name} Lottery - Tax Rate, Games & How to Claim | ${SITE_NAME}`;
-  const description = `${state.name} lottery information: ${state.taxRate > 0 ? `${(state.taxRate * 100).toFixed(2)}% state tax` : 'no state tax'} on winnings, ${state.availableGames.length} available games, prize claim procedures, and more.`;
+  const taxDisplay = state.taxRate > 0 ? `${(state.taxRate * 100).toFixed(1)}% Tax` : 'No State Tax';
+  const title = `${state.name} Lottery - ${taxDisplay}, ${state.availableGames.length} Games & Claims`;
+  const description = `${state.name} lottery guide: ${state.taxRate > 0 ? `${(state.taxRate * 100).toFixed(2)}% state tax` : 'no state tax'} on winnings, ${state.availableGames.length} games available, prize claim steps. Free info updated regularly.`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     openGraph: { title, description, url: `${SITE_URL}/states/${slug}` },
     alternates: { canonical: `${SITE_URL}/states/${slug}` },

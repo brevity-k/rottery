@@ -8,7 +8,7 @@ import { calculateGaps } from '@/lib/analysis/gaps';
 import { calculatePairs } from '@/lib/analysis/pairs';
 import { breadcrumbSchema, faqSchema } from '@/lib/seo/structuredData';
 import { getNumberDetailFaqs } from '@/lib/seo/faqContent';
-import { SITE_NAME, SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
+import { SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import LotteryBall from '@/components/lottery/LotteryBall';
 import JsonLd from '@/components/seo/JsonLd';
@@ -47,12 +47,12 @@ export async function generateMetadata({ params }: { params: Promise<{ lottery: 
   if (!lottery || !parsed) return {};
 
   const label = parsed.type === 'bonus' ? lottery.bonusNumber.label : 'Number';
-  const title = `${lottery.name} ${label} ${parsed.number} | ${SITE_NAME}`;
+  const title = `${lottery.name} ${label} ${parsed.number} - Frequency & Stats`;
   const description = `${lottery.name} ${label.toLowerCase()} ${parsed.number}: frequency rank, hot/cold status, gap analysis, top pairings, and recent draws. Free stats updated daily.`;
   const url = `${SITE_URL}/${lottery.slug}/numbers/${numberSlug}`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     openGraph: { title, description, url },
     alternates: { canonical: url },

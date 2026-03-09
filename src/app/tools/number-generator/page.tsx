@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { getAllLotteries } from '@/lib/lotteries/config';
 import { softwareAppSchema, breadcrumbSchema, faqSchema } from '@/lib/seo/structuredData';
 import { getNumberGeneratorFaqs } from '@/lib/seo/faqContent';
-import { SITE_NAME, SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
+import { SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
 import NumberGenerator from '@/components/numbers/NumberGenerator';
 import JsonLd from '@/components/seo/JsonLd';
 import FAQSection from '@/components/seo/FAQSection';
@@ -10,11 +10,11 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import Card from '@/components/ui/Card';
 
 export const metadata: Metadata = {
-  title: `Lottery Number Generator - Free Random Numbers | ${SITE_NAME}`,
-  description: 'Generate random lottery numbers for any US lottery. Uses cryptographically secure randomization for Powerball, Mega Millions, and more.',
+  title: { absolute: 'Lottery Number Generator - Free Random Numbers for Any Game' },
+  description: 'Generate random lottery numbers for Powerball, Mega Millions & more. Cryptographically secure randomization. Instant & free.',
   openGraph: {
-    title: `Lottery Number Generator | ${SITE_NAME}`,
-    description: 'Generate random lottery numbers for any US lottery. Uses cryptographically secure randomization for Powerball, Mega Millions, and more.',
+    title: 'Lottery Number Generator - Free Random Numbers for Any Game',
+    description: 'Generate random lottery numbers for Powerball, Mega Millions & more. Instant & free.',
     url: `${SITE_URL}/tools/number-generator`,
   },
   alternates: { canonical: `${SITE_URL}/tools/number-generator` },

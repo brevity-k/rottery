@@ -55,15 +55,16 @@ export function articleSchema(article: {
   description: string;
   slug: string;
   date: string;
-  author?: string;
+  dateModified?: string;
 }) {
   return {
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    '@type': 'BlogPosting',
     headline: article.title,
     description: article.description,
     url: `${SITE_URL}/blog/${article.slug}`,
     datePublished: article.date,
+    dateModified: article.dateModified || article.date,
     author: {
       '@type': 'Organization',
       name: SITE_NAME,
@@ -82,6 +83,7 @@ export function datasetSchema(dataset: {
   url: string;
   recordCount: number;
   dateRange: string;
+  dateModified?: string;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -90,6 +92,7 @@ export function datasetSchema(dataset: {
     description: dataset.description,
     url: dataset.url,
     license: 'https://creativecommons.org/publicdomain/zero/1.0/',
+    dateModified: dataset.dateModified || new Date().toISOString().split('T')[0],
     creator: {
       '@type': 'Organization',
       name: SITE_NAME,

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { SITE_NAME, SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
+import { SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
 import { calculateReadingTime } from '@/lib/utils/formatters';
 import { breadcrumbSchema, articleSchema } from '@/lib/seo/structuredData';
 import { getBlogPost, getAllBlogSlugs } from '@/lib/blog';
@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const post = getBlogPost(slug);
   if (!post) return {};
   return {
-    title: `${post.title} | ${SITE_NAME}`,
+    title: { absolute: post.title },
     description: post.description,
     openGraph: {
       title: post.title,

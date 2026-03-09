@@ -2,18 +2,18 @@ import { Metadata } from 'next';
 import { getAllLotteries } from '@/lib/lotteries/config';
 import { softwareAppSchema, breadcrumbSchema, faqSchema } from '@/lib/seo/structuredData';
 import { getOddsCalculatorFaqs } from '@/lib/seo/faqContent';
-import { SITE_NAME, SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
+import { SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
 import JsonLd from '@/components/seo/JsonLd';
 import FAQSection from '@/components/seo/FAQSection';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import Card from '@/components/ui/Card';
 
 export const metadata: Metadata = {
-  title: `Lottery Odds Calculator | ${SITE_NAME}`,
-  description: 'Understand your lottery odds. Compare jackpot probabilities for Powerball, Mega Millions, and other US lotteries.',
+  title: { absolute: 'Lottery Odds Calculator - Compare Jackpot Probabilities' },
+  description: 'Compare lottery odds for Powerball, Mega Millions & more. See exact probabilities for every prize tier. Free calculator.',
   openGraph: {
-    title: `Lottery Odds Calculator | ${SITE_NAME}`,
-    description: 'Understand your lottery odds. Compare jackpot probabilities for Powerball, Mega Millions, and other US lotteries.',
+    title: 'Lottery Odds Calculator - Compare Jackpot Probabilities',
+    description: 'Compare lottery odds for Powerball, Mega Millions & more. See exact probabilities for every prize tier.',
     url: `${SITE_URL}/tools/odds-calculator`,
   },
   alternates: { canonical: `${SITE_URL}/tools/odds-calculator` },

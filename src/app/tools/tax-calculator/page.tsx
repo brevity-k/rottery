@@ -1,18 +1,18 @@
 import { Metadata } from 'next';
 import { softwareAppSchema, breadcrumbSchema, faqSchema } from '@/lib/seo/structuredData';
 import { getTaxCalculatorFaqs } from '@/lib/seo/faqContent';
-import { SITE_NAME, SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
+import { SITE_URL, DISCLAIMER_TEXT } from '@/lib/utils/constants';
 import TaxCalculator from '@/components/tools/TaxCalculator';
 import JsonLd from '@/components/seo/JsonLd';
 import FAQSection from '@/components/seo/FAQSection';
 import Breadcrumbs from '@/components/layout/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: `Lottery Tax Calculator by State - Lump Sum vs Annuity | ${SITE_NAME}`,
-  description: 'Calculate your lottery winnings after federal and state taxes. Compare lump sum vs annuity payouts for Powerball, Mega Millions, and more. All 50 states covered.',
+  title: { absolute: 'Lottery Tax Calculator - Lump Sum vs Annuity by State' },
+  description: 'Calculate lottery winnings after federal & state taxes. Compare lump sum vs annuity for Powerball, Mega Millions & more. All 50 states. Free.',
   openGraph: {
-    title: `Lottery Tax Calculator by State | ${SITE_NAME}`,
-    description: 'Calculate your lottery winnings after federal and state taxes. Compare lump sum vs annuity payouts.',
+    title: 'Lottery Tax Calculator - Lump Sum vs Annuity by State',
+    description: 'Calculate lottery winnings after federal & state taxes. Compare lump sum vs annuity for all 50 states.',
     url: `${SITE_URL}/tools/tax-calculator`,
   },
   alternates: {
