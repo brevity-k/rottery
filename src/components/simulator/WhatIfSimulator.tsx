@@ -23,7 +23,7 @@ export default function WhatIfSimulator({ lotteries, drawsByGame }: WhatIfSimula
   const mainCount = lottery?.mainNumbers.count ?? 5;
   const mainMax = lottery?.mainNumbers.max ?? 69;
   const bonusMax = lottery?.bonusNumber.max ?? 26;
-  const draws = drawsByGame[selectedGame] || [];
+  const draws = useMemo(() => drawsByGame[selectedGame] || [], [drawsByGame, selectedGame]);
 
   const isReady =
     selectedNumbers.length === mainCount &&
