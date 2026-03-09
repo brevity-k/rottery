@@ -14,6 +14,9 @@ export default function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center space-x-6">
+            <Link href="/simulator" className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+              What If?
+            </Link>
             <LotteriesDropdown lotteries={lotteries} />
             <ToolsDropdown />
             <Link href="/my-numbers" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
@@ -103,6 +106,10 @@ function MobileMenu({ lotteries }: { lotteries: ReturnType<typeof getAllLotterie
           </svg>
         </summary>
         <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+          <Link href="/simulator" className="block px-4 py-2 text-sm font-semibold text-blue-600 hover:text-blue-700 hover:bg-gray-50">
+            What If?
+          </Link>
+          <div className="border-t border-gray-100 my-1" />
           <span className="block px-4 py-1 text-xs font-semibold text-gray-400 uppercase">Lotteries</span>
           {lotteries.map(lottery => (
             <Link
