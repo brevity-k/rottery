@@ -175,38 +175,29 @@ if (TOPICS.length !== TARGET_KEYWORDS.length) {
 
 function getTopicForToday(): string {
   const now = new Date();
-  const month = now.getMonth() + 1; // 1-12
-  const dayOfMonth = now.getDate();
-  const yearMonth = now.toISOString().slice(0, 7); // YYYY-MM
+  const month = now.getMonth() + 1;
+  const yearMonth = now.toISOString().slice(0, 7);
 
-  // Use seasonal/special topics only every 4th day to avoid near-duplicate posts.
-  // Other days use the standard 14-topic rotation.
-  const useOverride = dayOfMonth % 4 === 0;
-
-  if (useOverride) {
-    if (SPECIAL_TOPICS[yearMonth]) {
-      return SPECIAL_TOPICS[yearMonth];
-    }
-    if (SEASONAL_OVERRIDES[month]) {
-      return SEASONAL_OVERRIDES[month];
-    }
+  // Check special/seasonal overrides first (roughly every 4th week)
+  const weekOfYear = getWeekOfYear(now);
+  if (weekOfYear % 4 === 0) {
+    if (SPECIAL_TOPICS[yearMonth]) return SPECIAL_TOPICS[yearMonth];
+    if (SEASONAL_OVERRIDES[month]) return SEASONAL_OVERRIDES[month];
   }
 
-  // Standard rotation (day 1 = Jan 1)
-  const startOfYear = new Date(now.getFullYear(), 0, 1);
-  const dayOfYear = Math.floor(
-    (now.getTime() - startOfYear.getTime()) / 86400000
-  ) + 1;
-  return TOPICS[dayOfYear % TOPICS.length];
+  // Weekly rotation through 8 topics
+  return TOPICS[weekOfYear % TOPICS.length];
 }
 
 function getTargetKeywordForToday(): string {
-  const now = new Date();
-  const startOfYear = new Date(now.getFullYear(), 0, 1);
-  const dayOfYear = Math.floor(
-    (now.getTime() - startOfYear.getTime()) / 86400000
-  ) + 1;
-  return TARGET_KEYWORDS[dayOfYear % TARGET_KEYWORDS.length];
+  const weekOfYear = getWeekOfYear(new Date());
+  return TARGET_KEYWORDS[weekOfYear % TARGET_KEYWORDS.length];
+}
+
+function getWeekOfYear(date: Date): number {
+  const startOfYear = new Date(date.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((date.getTime() - startOfYear.getTime()) / 86400000) + 1;
+  return Math.ceil(dayOfYear / 7);
 }
 
 // ---------------------------------------------------------------------------
@@ -350,43 +341,53 @@ async function main() {
   const existingTitles = getExistingTitles().slice(-30);
 
   // Build prompt
-  const prompt = `You are a lottery statistics blogger for MyLottoStats.com, an SEO-optimized lottery information website.
+  const prompt = `You are a sharp, opinionated lottery statistics writer for MyLottoStats.com. You write like a smart friend explaining interesting things — conversational, surprising, data-backed, never boring.
 
-Generate a unique, data-driven blog post based on the data and topic below.
+Write a blog post based on the topic and data below.
 
-RULES:
-- Write 500-700 words of engaging, SEO-friendly content
-- Use data-driven language: "analysis", "trends", "patterns", "insights", "frequency data"
+VOICE & STYLE:
+- Open with a hook that makes the reader curious (a question, a surprising fact, a "what if" scenario)
+- Write like you're telling a friend something fascinating — not writing a textbook
+- Use specific numbers from the data (not vague "some numbers are hot")
+- Have a point of view. Say "this is surprising" or "this matters because..." — don't just list facts
+- Use short paragraphs. Mix in rhetorical questions. Keep it punchy.
+- 600-900 words. Quality over length.
+
+FORMATTING:
+- Use h2 for main sections, h3 for subsections
+- Use <strong> for emphasis, <em> for asides
+- Include at least one HTML table (<table>) when comparing data (numbers, states, games)
+- Use <blockquote> for one surprising stat or pull-quote that makes people stop and think
+
+LINKS (include 2-3 naturally):
+- <a href="/simulator">What-If Simulator</a> — our flagship tool, link when discussing hypotheticals
+- <a href="/powerball/statistics">Powerball stats</a>, <a href="/mega-millions/statistics">Mega Millions stats</a>
+- <a href="/tools/tax-calculator">tax calculator</a> for tax topics
+- <a href="/states">state lottery guide</a> for state comparisons
+- <a href="/powerball/numbers">number insights</a> for number analysis
+
+HARD RULES:
 - NEVER use: "prediction", "guaranteed", "winning strategy", "will win", "sure to hit"
-- Reference SPECIFIC numbers and statistics from the data provided
-- Always end with a brief disclaimer paragraph that lottery outcomes are random and analysis is for entertainment purposes only
-- Make the title unique — do NOT reuse any title from the existing titles list
-- Use proper HTML tags: h2, h3, p, ul, li, ol, strong, em
-- Make it informative and interesting for lottery enthusiasts
-- Cover multiple games when relevant, not just Powerball and Mega Millions
-- Naturally incorporate this SEO target keyword at least once: "${targetKeyword}"
-- Include 2-3 internal links where relevant using these paths:
-  - /powerball/statistics, /mega-millions/statistics (for statistics references)
-  - /tools/tax-calculator (for tax-related content)
-  - /states (for state-specific content)
-  - /powerball/numbers, /mega-millions/numbers (for number analysis references)
-  Format: <a href="/path">descriptive anchor text</a>
+- End with a 1-2 sentence disclaimer (lottery is random, this is entertainment)
+- Title must be under 60 characters and make someone want to click
+- Do NOT reuse any title from the existing titles list
+- Naturally include this keyword once: "${targetKeyword}"
 
 TODAY'S DATE: ${today}
-TOPIC FOCUS: ${topic}
+TOPIC: ${topic}
 
 ${gameSections}
 
-=== EXISTING POST TITLES (do NOT reuse these) ===
+=== EXISTING TITLES (avoid these) ===
 ${existingTitles.map((t) => `- ${t}`).join('\n') || '(none yet)'}
 
-Respond with ONLY valid JSON (no markdown fences, no explanation) in this exact format:
+Respond with ONLY valid JSON:
 {
-  "slug": "lowercase-hyphenated-slug-including-date-${today}",
-  "title": "Unique SEO Title Under 70 Characters",
-  "description": "Meta description under 160 characters",
-  "category": "Draw Recap | Weekly Analysis | Statistics | Number Trends | Deep Dive | Tax Analysis | Game Comparison",
-  "content": "<h2>First Section</h2><p>Content...</p>"
+  "slug": "catchy-slug-${today}",
+  "title": "Click-Worthy Title Under 60 Chars",
+  "description": "Compelling meta description under 155 chars with a reason to click",
+  "category": "What If | Weekly Trends | Deep Dive | Tax Guide | Game Comparison | Number Spotlight",
+  "content": "<h2>Hook Section</h2><p>Content...</p>"
 }`;
 
   console.log(`Generating blog post for ${today} (topic: ${topic})...`);

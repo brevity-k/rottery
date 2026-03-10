@@ -10,7 +10,7 @@
 import { RetryOptions } from './retry';
 
 /** Claude model used for blog generation and tax rate updates. */
-export const CLAUDE_MODEL = 'claude-haiku-4-5-20251001';
+export const CLAUDE_MODEL = 'claude-sonnet-4-6';
 
 // ---------------------------------------------------------------------------
 // Dataset registry — single source of truth for all lottery SODA dataset IDs
@@ -97,11 +97,11 @@ export const RETRY_PRESETS = {
  * replacing the entire month, to prevent near-duplicate daily posts.
  */
 export const SEASONAL_OVERRIDES: Record<number, string> = {
-  1: 'New Year lottery number trends and fresh start strategies for the new year',
-  3: 'Tax season guide for lottery winners — what to know before filing',
-  4: 'Tax season guide for lottery winners — maximizing your after-tax payout',
-  11: 'Holiday jackpot fever — Thanksgiving and year-end draw analysis',
-  12: 'Holiday jackpot fever — Christmas lottery traditions and year-end jackpot recap',
+  1: 'New Year, new numbers — did last year\'s hot numbers stay hot? A look back at what changed.',
+  3: 'Tax season is here. If you won anything last year, here\'s exactly what you owe (and how to keep more).',
+  4: 'Spring cleaning your lottery strategy — what the first quarter data tells us about the rest of the year.',
+  11: 'The Thanksgiving jackpot rush is real — why November draws are historically the biggest of the year.',
+  12: 'Year in review: the wildest lottery moments, biggest near-misses, and what the data says about next year.',
 };
 
 /**
@@ -110,40 +110,31 @@ export const SEASONAL_OVERRIDES: Record<number, string> = {
  */
 export const SPECIAL_TOPICS: Record<string, string> = {};
 
-/** Blog topic rotation — 14 topics cycling daily, paired 1:1 with TARGET_KEYWORDS. */
+/**
+ * Blog topic rotation — 8 topics cycling weekly, paired 1:1 with TARGET_KEYWORDS.
+ * Each topic is a reader question or curiosity hook, not a data dump.
+ */
 export const TOPICS: string[] = [
-  'Recap and analysis of the latest Powerball draw results',
-  'Weekly hot and cold number trends across all five lottery games',
-  'Mega Millions draw analysis and statistical trends',
-  'NY lottery game spotlight: NY Lotto and Take 5 patterns and strategies',
-  'Deep dive into overdue numbers across all games that are statistically due',
-  'Number pair spotlight: which combinations appear together most often',
-  'Mega Millions draw recap and weekend lottery outlook',
-  'NY Lotto analysis: frequency trends and number insights',
-  'Take 5 midday vs evening draw comparison and patterns',
-  'Lottery tax analysis: which states give you the best net payout',
-  'Multi-game comparison: Powerball vs Mega Millions — which has better odds',
-  'Statistical anomalies and interesting patterns in recent draws',
-  'State lottery spotlight: best states for lottery winners in terms of taxes',
-  'Lump sum vs annuity: what the numbers actually show for current jackpots',
+  'What would happen if you played the same numbers every draw for 10 years? Use our What-If Simulator data to tell a story about one hypothetical player.',
+  'The luckiest and unluckiest numbers this month — which numbers are on a hot streak and which have gone cold? Tell it as a narrative with personality.',
+  'You just won $500M — now what? Walk through the first 48 hours after winning, including taxes, lawyers, and the lump sum vs annuity decision.',
+  'The weirdest statistical coincidences in recent lottery draws — surprising patterns, rare repeats, or near-misses that actually happened in the data.',
+  'Powerball vs Mega Millions in 2026: which game gives you more bang for your buck after the Mega Millions price change? An honest comparison.',
+  'How much does your state really take from lottery winners? Rank the best and worst states with specific dollar examples on a $100M jackpot.',
+  'The most overdue numbers right now and what "overdue" actually means statistically — debunk the gambler\'s fallacy while making it interesting.',
+  'Near-miss stories from the What-If Simulator — what does it feel like to be one number away from millions? Use real data to paint the picture.',
 ];
 
 /** SEO target keywords to weave into blog posts, rotated alongside TOPICS. */
 export const TARGET_KEYWORDS: string[] = [
-  'most common powerball numbers',
-  'mega millions winning numbers analysis',
-  'hot and cold lottery numbers',
-  'lottery tax calculator by state',
-  'powerball number frequency',
-  'overdue powerball numbers',
-  'lump sum vs annuity lottery',
-  'best states for lottery winners',
-  'powerball vs mega millions odds',
-  'ny lotto winning numbers',
-  'ny lotto results today',
-  'take 5 winning numbers',
-  'lottery number pairs patterns',
-  'how to pick lottery numbers statistically',
+  'what if i played the same lottery numbers',
+  'hot and cold lottery numbers this week',
+  'what to do if you win the lottery',
+  'lottery number patterns and coincidences',
+  'powerball vs mega millions which is better',
+  'best states for lottery winners taxes',
+  'overdue lottery numbers meaning',
+  'closest lottery near miss stories',
 ];
 
 // ---------------------------------------------------------------------------

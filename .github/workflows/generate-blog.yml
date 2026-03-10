@@ -1,9 +1,9 @@
 name: Generate Blog Post
 
 on:
-  workflow_run:
-    workflows: ["Fetch Lottery Data"]
-    types: [completed]
+  schedule:
+    # Weekly on Monday at 7 AM UTC (2 AM ET), after weekend draws are fetched
+    - cron: '0 7 * * 1'
   workflow_dispatch: # Allow manual trigger
 
 concurrency:
@@ -32,7 +32,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate daily blog post
+      - name: Fetch latest data before generating
+        run: npx tsx scripts/update-data.ts
+
+      - name: Generate weekly blog post
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: npx tsx scripts/generate-blog-post.ts
@@ -57,7 +60,7 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add content/blog/ CLAUDE.md
-          git commit -m "chore: generate daily blog post $(date -u +%Y-%m-%d)"
+          git commit -m "chore: generate weekly blog post $(date -u +%Y-%m-%d)"
           git pull --rebase origin main
           git push
 
